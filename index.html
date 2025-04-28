@@ -3,151 +3,1625 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virke och Kapningsberäknare</title>
+    <title>Smart Virke- och Kapningsberäknare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f9fc;
-            color: #333;
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #60ad5e;
+            --primary-dark: #005005;
+            --secondary: #455a64;
+            --secondary-light: #718792;
+            --secondary-dark: #1c313a;
+            --white: #ffffff;
+            --light-grey: #f5f5f5;
+            --grey: #e0e0e0;
+            --dark-grey: #616161;
+            --error: #d32f2f;
+            --warning: #ffa000;
+            --success: #388e3c;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --border-radius: 8px;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
         }
-        h2, h3, h4 {
-            color: #222;
-        }
-        .container {
-            background: white;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        }
-        input, button {
-            padding: 8px;
-            margin-top: 5px;
-            width: 100%;
+
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-grey);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3, h4 {
+            margin-bottom: 15px;
+            color: var(--secondary-dark);
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            text-align: center;
+            margin: 20px 0 30px;
+            font-size: 2.2rem;
+        }
+
+        .container {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+        }
+
+        .container:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            flex: 1 1 300px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--secondary-dark);
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--grey);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+        }
+
         button {
-            background-color: #4caf50;
-            color: white;
+            background-color: var(--primary);
+            color: var(--white);
             border: none;
+            font-weight: 500;
             cursor: pointer;
-            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 15px;
         }
+
         button:hover {
-            background-color: #45a049;
+            background-color: var(--primary-dark);
         }
-        .planka {
-            display: inline-block;
-            background-color: #4caf50;
-            color: white;
-            padding: 4px 8px;
-            margin: 2px;
-            border-radius: 4px;
+
+        button.secondary {
+            background-color: var(--secondary);
         }
-        .spill {
-            background-color: #f44336;
+
+        button.secondary:hover {
+            background-color: var(--secondary-dark);
         }
-        .lager-inputs {
+
+        button.small {
+            padding: 6px 10px;
+            font-size: 14px;
+        }
+
+        button.icon {
+            width: auto;
+            padding: 8px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button.danger {
+            background-color: var(--error);
+        }
+
+        button.danger:hover {
+            background-color: #b71c1c;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--grey);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab:hover:not(.active) {
+            background-color: var(--light-grey);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--grey);
+        }
+
+        thead th {
+            background-color: var(--light-grey);
+            font-weight: 600;
+            color: var(--secondary-dark);
+        }
+
+        tr:hover {
+            background-color: var(--light-grey);
+        }
+
+        .actions {
             display: flex;
             gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .kapning-container {
+            margin-top: 20px;
+        }
+
+        .planka {
+            border-radius: 4px;
+            margin-bottom: 10px;
+            position: relative;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            overflow: hidden;
+        }
+
+        .planka-info {
+            background: var(--secondary);
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .planka-segments {
+            display: flex;
+            height: 40px;
+        }
+
+        .segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding: 0 5px;
+        }
+
+        .segment.virke {
+            background-color: var(--primary);
+        }
+
+        .segment.spill {
+            background-color: var(--error);
+        }
+
+        .segment.waste {
+            background-color: #f44336;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border-left: 4px solid #1976d2;
+        }
+
+        .alert-warning {
+            background-color: #fff8e1;
+            color: #f57f17;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .badge-primary {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .summary-box {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            background-color: var(--light-grey);
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .summary-box h4 {
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+        }
+
+        .summary-data {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .summary-item {
+            flex: 1 1 150px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--secondary-dark);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
             margin-bottom: 10px;
         }
-        .lager-inputs input {
-            flex: 1;
+
+        .lager-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .lager-row button {
+            width: 40px;
+            flex-shrink: 0;
+        }
+        
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            width: 90%;
+            max-width: 600px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--grey);
+            margin-bottom: 15px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--dark-grey);
+            width: auto;
+            padding: 0;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid var(--grey);
+            margin-top: 15px;
+        }
+        
+        .results-box {
+            margin-top: 20px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            tr {
+                margin-bottom: 15px;
+                border: 1px solid var(--grey);
+                border-radius: var(--border-radius);
+            }
+            
+            td {
+                border: none;
+                border-bottom: 1px solid var(--grey);
+                position: relative;
+                padding-left: 50%;
+            }
+            
+            td:before {
+                position: absolute;
+                top: 12px;
+                left: 15px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: 600;
+            }
+            
+            td:nth-of-type(1):before { content: "Namn"; }
+            td:nth-of-type(2):before { content: "Antal"; }
+            td:nth-of-type(3):before { content: "Längd"; }
+            td:nth-of-type(4):before { content: "Total längd"; }
+            td:nth-of-type(5):before { content: "Åtgärder"; }
         }
     </style>
-    <script>
-        let artiklar = [];
+</head>
+<body>
+    <h1><i class="fas fa-tools"></i> Smart Virke- och Kapningsberäknare</h1>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="artiklar">Artiklar</div>
+            <div class="tab" data-tab="lager">Lagerlängder</div>
+            <div class="tab" data-tab="resultat">Resultat</div>
+            <div class="tab" data-tab="projekt">Spara/Ladda Projekt</div>
+        </div>
+        
+        <!-- Artiklar Tab -->
+        <div class="tab-content active" id="artiklar-content">
+            <h3>Lägg till virke som behövs</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Definiera allt virke du behöver för ditt projekt här. Du kan lägga till flera artiklar med olika dimensioner.
+            </div>
+            
+            <form id="artikel-form">
+                <div class="flex">
+                    <div class="form-group">
+                        <label for="dimension-select">Standarddimension:</label>
+                        <select id="dimension-select">
+                            <option value="">Anpassad dimension...</option>
+                            <option value="45x45">45x45 mm</option>
+                            <option value="45x70">45x70 mm</option>
+                            <option value="45x95">45x95 mm</option>
+                            <option value="45x120">45x120 mm</option>
+                            <option value="45x145">45x145 mm</option>
+                            <option value="45x170">45x170 mm</option>
+                            <option value="45x195">45x195 mm</option>
+                            <option value="70x70">70x70 mm</option>
+                            <option value="70x145">70x145 mm</option>
+                            <option value="95x95">95x95 mm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="artikel-namn">Artikelnamn/Dimension:</label>
+                        <input type="text" id="artikel-namn" placeholder="t.ex. 45x95, Takregel, etc.">
+                    </div>
+                </div>
+                
+                <div class="flex">
+                    <div class="form-group">
+                        <label for="behov-antal">Antal stycken:</label>
+                        <input type="number" min="1" id="behov-antal" placeholder="Antal bitar">
+                    </div>
+                    <div class="form-group">
+                        <label for="behov-langd">Längd per styck (mm):</label>
+                        <input type="number" min="1" id="behov-langd" placeholder="t.ex. 2400">
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button type="button" id="clear-artikel-btn" class="secondary">
+                        <i class="fas fa-eraser"></i> Rensa
+                    </button>
+                    <button type="submit" id="add-artikel-btn">
+                        <i class="fas fa-plus"></i> Lägg till artikel
+                    </button>
+                </div>
+            </form>
+            
+            <h3>Tillagda artiklar</h3>
+            <div id="artikel-table-container">
+                <table id="artikel-table">
+                    <thead>
+                        <tr>
+                            <th>Namn</th>
+                            <th>Antal</th>
+                            <th>Längd (mm)</th>
+                            <th>Total längd (m)</th>
+                            <th>Åtgärder</th>
+                        </tr>
+                    </thead>
+                    <tbody id="artikel-list">
+                        <!-- Artiklar kommer att läggas till här dynamiskt -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="actions">
+                <button type="button" id="calculate-btn" class="secondary">
+                    <i class="fas fa-calculator"></i> Beräkna optimal kapning
+                </button>
+            </div>
+        </div>
+        
+        <!-- Lager Tab -->
+        <div class="tab-content" id="lager-content">
+            <h3>Hantera lagerlängder</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Definiera vilka längder som finns tillgängliga för inköp och deras priser per meter.
+            </div>
+            
+            <div class="flex">
+                <div class="form-group">
+                    <label for="dimension-filter">Välj dimension:</label>
+                    <select id="dimension-filter">
+                        <!-- Dimensioner kommer att läggas till här dynamiskt -->
+                    </select>
+                </div>
+            </div>
+            
+            <form id="lager-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lager-langd">Längd (mm):</label>
+                        <input type="number" min="1" id="lager-langd" placeholder="t.ex. 3600">
+                    </div>
+                    <div class="form-group">
+                        <label for="lager-pris">Pris per meter (kr):</label>
+                        <input type="number" min="0" step="0.01" id="lager-pris" placeholder="t.ex. 22.50">
+                    </div>
+                    <button type="submit" id="add-lager-btn">
+                        <i class="fas fa-plus"></i> Lägg till
+                    </button>
+                </div>
+            </form>
+            
+            <div id="standard-lengths-container">
+                <h4>Vanliga standardlängder</h4>
+                <button class="small" data-length="2400">2400 mm</button>
+                <button class="small" data-length="3000">3000 mm</button>
+                <button class="small" data-length="3600">3600 mm</button>
+                <button class="small" data-length="4200">4200 mm</button>
+                <button class="small" data-length="4800">4800 mm</button>
+                <button class="small" data-length="5400">5400 mm</button>
+            </div>
+            
+            <h4>Lagerlängder för <span id="current-dimension">denna dimension</span></h4>
+            <div id="lager-list">
+                <!-- Lagerlängder kommer att läggas till här dynamiskt -->
+            </div>
+        </div>
+        
+        <!-- Resultat Tab -->
+        <div class="tab-content" id="resultat-content">
+            <h3>Optimerad kapning</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Här visas den optimala kapningen baserat på dina artiklar och tillgängliga lagerlängder.
+            </div>
+            
+            <div class="summary-box">
+                <h4>Sammanfattning</h4>
+                <div class="summary-data">
+                    <div class="summary-item">
+                        <div class="summary-label">Totalt antal plankor</div>
+                        <div class="summary-value" id="total-plankor">0</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total kostnad</div>
+                        <div class="summary-value" id="total-kostnad">0 kr</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total längd</div>
+                        <div class="summary-value" id="total-langd">0 m</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total spillmängd</div>
+                        <div class="summary-value" id="total-spill">0 m (0%)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex">
+                <div class="form-group">
+                    <label for="optimization-strategy">Optimeringsmetod:</label>
+                    <select id="optimization-strategy">
+                        <option value="minimizeWaste">Minimera spill</option>
+                        <option value="minimizeCost">Minimera kostnad</option>
+                        <option value="minimizePlanks">Minimera antal plankor</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="result-container">
+                <!-- Resultat kommer att visas här -->
+                <div class="no-results">
+                    <i class="fas fa-calculator fa-3x"></i>
+                    <p>Lägg till artiklar och lagerlängder, sedan klicka på "Beräkna optimal kapning"</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Projekt Tab -->
+        <div class="tab-content" id="projekt-content">
+            <h3>Hantera projekt</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Här kan du spara ditt nuvarande projekt eller ladda ett tidigare sparat projekt.
+            </div>
+            
+            <div class="form-group">
+                <label for="projekt-namn">Projektnamn:</label>
+                <input type="text" id="projekt-namn" placeholder="t.ex. Altan 2025">
+            </div>
+            
+            <div class="actions">
+                <button id="save-projekt-btn">
+                    <i class="fas fa-save"></i> Spara projekt
+                </button>
+                <button id="export-projekt-btn" class="secondary">
+                    <i class="fas fa-file-export"></i> Exportera som JSON
+                </button>
+            </div>
+            
+            <h4>Sparade projekt</h4>
+            <div id="saved-projects">
+                <!-- Sparade projekt kommer att visas här -->
+                <p>Inga sparade projekt hittades.</p>
+            </div>
+            
+            <h4>Importera projekt</h4>
+            <div class="form-group">
+                <label for="import-file">Välj JSON-fil att importera:</label>
+                <input type="file" id="import-file" accept=".json">
+            </div>
+            <button id="import-projekt-btn">
+                <i class="fas fa-file-import"></i> Importera projekt
+            </button>
+        </div>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Redigera artikel</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="edit-namn">Artikelnamn/Dimension:</label>
+                    <input type="text" id="edit-namn">
+                </div>
+                <div class="flex">
+                    <div class="form-group">
+                        <label for="edit-antal">Antal stycken:</label>
+                        <input type="number" min="1" id="edit-antal">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-langd">Längd per styck (mm):</label>
+                        <input type="number" min="1" id="edit-langd">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="secondary modal-close-btn">Avbryt</button>
+                    <button type="submit">Spara ändringar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        function addLagerInput() {
-            const lagerContainer = document.getElementById('lager-container');
-            const div = document.createElement('div');
-            div.className = 'lager-inputs';
-            div.innerHTML = '<input type="number" placeholder="Längd (mm)" class="lager-langd" />' +
-                            '<input type="number" placeholder="Pris per meter (kr)" class="lager-pris" />';
-            lagerContainer.appendChild(div);
+    <script>
+        // Datastruktur för applikationen
+        const app = {
+            artiklar: [],
+            lagerLangder: {},
+            currentDimension: '',
+            lastId: 0
+        };
+
+        // Hjälpfunktioner
+        function generateId() {
+            app.lastId++;
+            return app.lastId;
         }
 
-        function addArtikel() {
-            const namn = document.getElementById('artikel-namn').value;
-            const antal = parseInt(document.getElementById('behov-antal').value);
-            const langd = parseInt(document.getElementById('behov-langd').value);
-            const lagerInputs = document.querySelectorAll('.lager-inputs');
+        function getDimensionFromArtikelnamn(namn) {
+            const dimensionMatch = namn.match(/(\d+)x(\d+)/);
+            if (dimensionMatch) {
+                return `${dimensionMatch[1]}x${dimensionMatch[2]}`;
+            }
+            return namn;
+        }
 
-            let lagerLangder = [];
-            lagerInputs.forEach(div => {
-                const langdInput = div.querySelector('.lager-langd').value;
-                const prisInput = div.querySelector('.lager-pris').value;
-                if(langdInput && prisInput) {
-                    lagerLangder.push({ langd: parseInt(langdInput), pris: parseFloat(prisInput) });
+        function formatPrice(price) {
+            return parseFloat(price).toFixed(2).replace('.', ',') + ' kr';
+        }
+
+        function formatLength(length) {
+            if (length >= 1000) {
+                return (length / 1000).toFixed(2).replace('.', ',') + ' m';
+            }
+            return length + ' mm';
+        }
+
+        function formatPercentage(value, total) {
+            const percentage = (value / total) * 100;
+            return percentage.toFixed(1).replace('.', ',') + '%';
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(`${this.dataset.tab}-content`).classList.add('active');
+                });
+            });
+            
+            // Dimension select
+            document.getElementById('dimension-select').addEventListener('change', function() {
+                if (this.value) {
+                    document.getElementById('artikel-namn').value = this.value;
                 }
             });
+            
+            // Artikel form
+            document.getElementById('artikel-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addArtikel();
+            });
+            
+            // Clear artikel form
+            document.getElementById('clear-artikel-btn').addEventListener('click', function() {
+                document.getElementById('artikel-namn').value = '';
+                document.getElementById('behov-antal').value = '';
+                document.getElementById('behov-langd').value = '';
+                document.getElementById('dimension-select').selectedIndex = 0;
+            });
+            
+            // Calculate button
+            document.getElementById('calculate-btn').addEventListener('click', calculateOptimalCuts);
+            
+            // Lager form
+            document.getElementById('lager-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addLagerLangd();
+            });
+            
+            // Dimension filter
+            document.getElementById('dimension-filter').addEventListener('change', function() {
+                app.currentDimension = this.value;
+                updateLagerList();
+            });
+            
+            // Standard lengths buttons
+            document.querySelectorAll('#standard-lengths-container button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('lager-langd').value = this.dataset.length;
+                });
+            });
+            
+            // Modal close buttons
+            document.querySelectorAll('.modal-close, .modal-close-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    closeModal();
+                });
+            });
+            
+            // Edit form
+            document.getElementById('edit-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveEditedArtikel();
+            });
+            
+            // Optimization strategy
+            document.getElementById('optimization-strategy').addEventListener('change', function() {
+                if (app.artiklar.length > 0) {
+                    calculateOptimalCuts();
+                }
+            });
+            
+            // Save projekt
+            document.getElementById('save-projekt-btn').addEventListener('click', saveProjekt);
+            
+            // Export projekt
+            document.getElementById('export-projekt-btn').addEventListener('click', exportProjekt);
+            
+            // Import projekt
+            document.getElementById('import-projekt-btn').addEventListener('click', importProjekt);
+            
+            // Ladda sparade data från localStorage
+            loadFromLocalStorage();
+        });
 
-            artiklar.push({ namn, antal, langd, lagerLangder });
-
-            const lista = document.getElementById('artikel-lista');
-            lista.innerHTML += `<li>${namn}: ${antal} st á ${langd} mm</li>`;
-
+        // Hantera artiklar
+        function addArtikel() {
+            const namn = document.getElementById('artikel-namn').value.trim();
+            const antal = parseInt(document.getElementById('behov-antal').value);
+            const langd = parseInt(document.getElementById('behov-langd').value);
+            
+            if (!namn || isNaN(antal) || isNaN(langd) || antal <= 0 || langd <= 0) {
+                alert('Vänligen fyll i alla fält korrekt.');
+                return;
+            }
+            
+            const dimension = getDimensionFromArtikelnamn(namn);
+            
+            const artikel = {
+                id: generateId(),
+                namn: namn,
+                dimension: dimension,
+                antal: antal,
+                langd: langd
+            };
+            
+            app.artiklar.push(artikel);
+            
+            // Skapa lagerlängder för dimensionen om de inte finns
+            if (!app.lagerLangder[dimension]) {
+                app.lagerLangder[dimension] = [];
+                
+                // Lägg till standardlängder om detta är första artikeln med denna dimension
+                const standardLangder = [2400, 3000, 3600, 4200, 4800, 5400];
+                const standardPriser = {
+                    '45x45': 18.5,
+                    '45x70': 21.0,
+                    '45x95': 23.5,
+                    '45x120': 27.0,
+                    '45x145': 32.5,
+                    '45x170': 38.0,
+                    '45x195': 46.0,
+                    '70x70': 36.0,
+                    '70x145': 58.0,
+                    '95x95': 69.0
+                };
+                
+                const basePris = standardPriser[dimension] || 25.0;
+                
+                standardLangder.forEach(langd => {
+                    app.lagerLangder[dimension].push({
+                        langd: langd,
+                        pris: basePris
+                    });
+                });
+                
+                // Uppdatera dimensionsfilter i lagerlängdstab
+                updateDimensionFilter();
+            }
+            
+            // Rensa formuläret
             document.getElementById('artikel-namn').value = '';
             document.getElementById('behov-antal').value = '';
             document.getElementById('behov-langd').value = '';
-            document.getElementById('lager-container').innerHTML = '';
+            document.getElementById('dimension-select').selectedIndex = 0;
+            
+            // Uppdatera UI
+            updateArtikelList();
+            saveToLocalStorage();
         }
-
-        function calculateCuts() {
-            const output = document.getElementById('output');
-            output.innerHTML = '';
-
-            artiklar.forEach((artikel, index) => {
-                output.innerHTML += `<div class="container">
-                <h4>Artikel ${index + 1}: ${artikel.namn} (${artikel.antal} st á ${artikel.langd} mm)</h4>`;
-
-                artikel.lagerLangder.sort((a, b) => b.langd - a.langd);
-
-                artikel.lagerLangder.forEach(lager => {
-                    const antalPerPlanka = Math.floor(lager.langd / artikel.langd);
-                    if (antalPerPlanka > 0) {
-                        const plankorSomBehovs = Math.ceil(artikel.antal / antalPerPlanka);
-                        const totaltSvinn = (lager.langd - (antalPerPlanka * artikel.langd)) * plankorSomBehovs;
-                        const totalPris = plankorSomBehovs * (lager.langd / 1000) * lager.pris;
-
-                        let grafik = '';
-                        for (let i = 0; i < antalPerPlanka; i++) grafik += `<span class="planka">${artikel.langd}</span>`;
-                        grafik += `<span class="planka spill">${lager.langd - (antalPerPlanka * artikel.langd)}</span>`;
-
-                        output.innerHTML += `<div>
-                            <strong>${plankorSomBehovs} st</strong> á <strong>${lager.langd} mm</strong><br>
-                            Svinn: <strong>${totaltSvinn} mm</strong>, Kostnad: <strong>${totalPris.toFixed(2)} kr</strong>
-                            <div>${grafik}</div>
-                        </div>`;
-                    }
-                });
-
-                output.innerHTML += `</div>`;
+        
+        function updateArtikelList() {
+            const tbody = document.getElementById('artikel-list');
+            tbody.innerHTML = '';
+            
+            if (app.artiklar.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">Inga artiklar tillagda än.</td></tr>';
+                return;
+            }
+            
+            app.artiklar.forEach(artikel => {
+                const tr = document.createElement('tr');
+                
+                const totalLangd = (artikel.antal * artikel.langd) / 1000; // i meter
+                
+                tr.innerHTML = `
+                    <td>${artikel.namn}</td>
+                    <td>${artikel.antal} st</td>
+                    <td>${artikel.langd} mm</td>
+                    <td>${totalLangd.toFixed(2).replace('.', ',')} m</td>
+                    <td class="actions">
+                        <button class="icon small" onclick="editArtikel(${artikel.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="icon small danger" onclick="deleteArtikel(${artikel.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
             });
         }
+        
+        function editArtikel(id) {
+            const artikel = app.artiklar.find(a => a.id === id);
+            if (!artikel) return;
+            
+            document.getElementById('edit-id').value = artikel.id;
+            document.getElementById('edit-namn').value = artikel.namn;
+            document.getElementById('edit-antal').value = artikel.antal;
+            document.getElementById('edit-langd').value = artikel.langd;
+            
+            openModal('edit-modal');
+        }
+        
+        function saveEditedArtikel() {
+            const id = parseInt(document.getElementById('edit-id').value);
+            const namn = document.getElementById('edit-namn').value.trim();
+            const antal = parseInt(document.getElementById('edit-antal').value);
+            const langd = parseInt(document.getElementById('edit-langd').value);
+            
+            if (!namn || isNaN(antal) || isNaN(langd) || antal <= 0 || langd <= 0) {
+                alert('Vänligen fyll i alla fält korrekt.');
+                return;
+            }
+            
+            const index = app.artiklar.findIndex(a => a.id === id);
+            if (index !== -1) {
+                const dimension = getDimensionFromArtikelnamn(namn);
+                
+                // Uppdatera artikeln
+                app.artiklar[index] = {
+                    id: id,
+                    namn: namn,
+                    dimension: dimension,
+                    antal: antal,
+                    langd: langd
+                };
+                
+                // Skapa lagerlängder för dimensionen om de inte finns
+                if (!app.lagerLangder[dimension]) {
+                    app.lagerLangder[dimension] = [];
+                    updateDimensionFilter();
+                }
+                
+                // Uppdatera UI
+                updateArtikelList();
+                saveToLocalStorage();
+                closeModal();
+                
+                // Uppdatera beräkningar om resultat redan visas
+                if (document.querySelector('#result-container .kapning-container')) {
+                    calculateOptimalCuts();
+                }
+            }
+        }
+        
+        function deleteArtikel(id) {
+            if (confirm('Är du säker på att du vill ta bort denna artikel?')) {
+                const index = app.artiklar.findIndex(a => a.id === id);
+                if (index !== -1) {
+                    app.artiklar.splice(index, 1);
+                    updateArtikelList();
+                    saveToLocalStorage();
+                    
+                    // Uppdatera beräkningar om resultat redan visas
+                    if (document.querySelector('#result-container .kapning-container')) {
+                        calculateOptimalCuts();
+                    }
+                }
+            }
+        }
+        
+        // Hantera lagerlängder
+        function addLagerLangd() {
+            const dimension = document.getElementById('dimension-filter').value;
+            const langd = parseInt(document.getElementById('lager-langd').value);
+            const pris = parseFloat(document.getElementById('lager-pris').value);
+            
+            if (!dimension) {
+                alert('Välj först en dimension.');
+                return;
+            }
+            
+            if (isNaN(langd) || isNaN(pris) || langd <= 0 || pris < 0) {
+                alert('Vänligen fyll i alla fält korrekt.');
+                return;
+            }
+            
+            // Kontrollera om längden redan finns
+            const existingIndex = app.lagerLangder[dimension].findIndex(l => l.langd === langd);
+            if (existingIndex !== -1) {
+                // Uppdatera pris om längden redan finns
+                app.lagerLangder[dimension][existingIndex].pris = pris;
+            } else {
+                // Lägg till ny längd
+                app.lagerLangder[dimension].push({
+                    langd: langd,
+                    pris: pris
+                });
+                
+                // Sortera efter längd
+                app.lagerLangder[dimension].sort((a, b) => a.langd - b.langd);
+            }
+            
+            // Rensa formuläret
+            document.getElementById('lager-langd').value = '';
+            document.getElementById('lager-pris').value = '';
+            
+            // Uppdatera UI
+            updateLagerList();
+            saveToLocalStorage();
+        }
+        
+        function updateDimensionFilter() {
+            const select = document.getElementById('dimension-filter');
+            const currentValue = select.value;
+            select.innerHTML = '';
+            
+            const dimensions = Object.keys(app.lagerLangder);
+            
+            if (dimensions.length === 0) {
+                select.innerHTML = '<option value="">Inga dimensioner tillgängliga</option>';
+                return;
+            }
+            
+            dimensions.forEach(dimension => {
+                const option = document.createElement('option');
+                option.value = dimension;
+                option.textContent = dimension;
+                select.appendChild(option);
+            });
+            
+            // Återställ vald dimension om möjligt
+            if (currentValue && dimensions.includes(currentValue)) {
+                select.value = currentValue;
+            } else {
+                app.currentDimension = dimensions[0];
+                select.value = app.currentDimension;
+            }
+            
+            document.getElementById('current-dimension').textContent = app.currentDimension;
+        }
+        
+        function updateLagerList() {
+            const dimension = document.getElementById('dimension-filter').value;
+            const container = document.getElementById('lager-list');
+            container.innerHTML = '';
+            
+            document.getElementById('current-dimension').textContent = dimension || 'denna dimension';
+            
+            if (!dimension || !app.lagerLangder[dimension] || app.lagerLangder[dimension].length === 0) {
+                container.innerHTML = '<p>Inga lagerlängder tillagda för denna dimension.</p>';
+                return;
+            }
+            
+            app.lagerLangder[dimension].forEach((lager, index) => {
+                const div = document.createElement('div');
+                div.className = 'lager-row';
+                div.innerHTML = `
+                    <div class="form-group" style="flex: 3;">
+                        <input type="number" value="${lager.langd}" min="1" class="lager-langd-edit" data-index="${index}">
+                    </div>
+                    <div class="form-group" style="flex: 2;">
+                        <input type="number" value="${lager.pris}" min="0" step="0.01" class="lager-pris-edit" data-index="${index}">
+                    </div>
+                    <button type="button" class="danger" onclick="deleteLagerLangd('${dimension}', ${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                
+                container.appendChild(div);
+            });
+            
+            // Lägg till event listeners för att uppdatera priserna
+            document.querySelectorAll('.lager-langd-edit').forEach(input => {
+                input.addEventListener('change', function() {
+                    const index = parseInt(this.dataset.index);
+                    const langd = parseInt(this.value);
+                    
+                    if (!isNaN(langd) && langd > 0) {
+                        app.lagerLangder[dimension][index].langd = langd;
+                        saveToLocalStorage();
+                        
+                        // Sortera och uppdatera listan
+                        app.lagerLangder[dimension].sort((a, b) => a.langd - b.langd);
+                        updateLagerList();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.lager-pris-edit').forEach(input => {
+                input.addEventListener('change', function() {
+                    const index = parseInt(this.dataset.index);
+                    const pris = parseFloat(this.value);
+                    
+                    if (!isNaN(pris) && pris >= 0) {
+                        app.lagerLangder[dimension][index].pris = pris;
+                        saveToLocalStorage();
+                    }
+                });
+            });
+        }
+        
+        function deleteLagerLangd(dimension, index) {
+            if (confirm('Är du säker på att du vill ta bort denna lagerlängd?')) {
+                app.lagerLangder[dimension].splice(index, 1);
+                updateLagerList();
+                saveToLocalStorage();
+                
+                // Uppdatera beräkningar om resultat redan visas
+                if (document.querySelector('#result-container .kapning-container')) {
+                    calculateOptimalCuts();
+                }
+            }
+        }
+        
+        // Optimerad kapningsberäkning
+        function calculateOptimalCuts() {
+            if (app.artiklar.length === 0) {
+                alert('Lägg till minst en artikel först.');
+                return;
+            }
+            
+            const results = document.getElementById('result-container');
+            results.innerHTML = '<div class="spinner"></div>';
+            
+            // Samla alla artiklar per dimension
+            const artiklarPerDimension = {};
+            
+            app.artiklar.forEach(artikel => {
+                if (!artiklarPerDimension[artikel.dimension]) {
+                    artiklarPerDimension[artikel.dimension] = [];
+                }
+                
+                artiklarPerDimension[artikel.dimension].push(artikel);
+            });
+            
+            // För varje dimension, optimera kapningen
+            const optimeringsMetod = document.getElementById('optimization-strategy').value;
+            let html = '';
+            
+            let totalPlankor = 0;
+            let totalKostnad = 0;
+            let totalLangd = 0;
+            let totalSpill = 0;
+            
+            Object.keys(artiklarPerDimension).forEach(dimension => {
+                const artiklar = artiklarPerDimension[dimension];
+                
+                // Kontrollera om det finns lagerlängder för denna dimension
+                if (!app.lagerLangder[dimension] || app.lagerLangder[dimension].length === 0) {
+                    html += `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Inga lagerlängder definierade för dimension <strong>${dimension}</strong>. 
+                            Vänligen gå till fliken "Lagerlängder" och lägg till längder.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Samla alla behövda längder (med antal)
+                const behovdaLangder = [];
+                artiklar.forEach(artikel => {
+                    for (let i = 0; i < artikel.antal; i++) {
+                        behovdaLangder.push({
+                            artikelId: artikel.id,
+                            namn: artikel.namn,
+                            langd: artikel.langd
+                        });
+                    }
+                });
+                
+                // Sortera behövda längder efter längd (fallande)
+                behovdaLangder.sort((a, b) => b.langd - a.langd);
+                
+                // Kapningsanalys för olika lagerlängder
+                const resultatPerLagerLangd = [];
+                
+                app.lagerLangder[dimension].forEach(lager => {
+                    const resultat = optimerKapning(behovdaLangder, lager.langd, lager.pris, optimeringsMetod);
+                    resultatPerLagerLangd.push({
+                        lagerLangd: lager.langd,
+                        lagerPris: lager.pris,
+                        ...resultat
+                    });
+                });
+                
+                // Välj det bästa resultatet baserat på optimeringsmetod
+                resultatPerLagerLangd.sort((a, b) => {
+                    if (optimeringsMetod === 'minimizeWaste') {
+                        return a.totalSpill - b.totalSpill;
+                    } else if (optimeringsMetod === 'minimizeCost') {
+                        return a.totalKostnad - b.totalKostnad;
+                    } else { // minimizePlanks
+                        return a.plankor.length - b.plankor.length;
+                    }
+                });
+                
+                const bastaResultat = resultatPerLagerLangd[0];
+                
+                if (!bastaResultat) {
+                    html += `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Ingen lagerlängd är tillräckligt lång för att rymma artiklar med dimension <strong>${dimension}</strong>.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Uppdatera totaler
+                totalPlankor += bastaResultat.plankor.length;
+                totalKostnad += bastaResultat.totalKostnad;
+                totalLangd += bastaResultat.totalLangd;
+                totalSpill += bastaResultat.totalSpill;
+                
+                // Skapa HTML för resultatet
+                html += `
+                    <div class="kapning-container">
+                        <h4>Dimension: ${dimension} <span class="badge badge-primary">${bastaResultat.plankor.length} plankor</span></h4>
+                        <div class="summary-box">
+                            <div class="summary-data">
+                                <div class="summary-item">
+                                    <div class="summary-label">Lagerlängd</div>
+                                    <div class="summary-value">${formatLength(bastaResultat.lagerLangd)}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Pris per meter</div>
+                                    <div class="summary-value">${formatPrice(bastaResultat.lagerPris)}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Totalt spill</div>
+                                    <div class="summary-value">${formatLength(bastaResultat.totalSpill)} (${formatPercentage(bastaResultat.totalSpill, bastaResultat.totalLangd)})</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Total kostnad</div>
+                                    <div class="summary-value">${formatPrice(bastaResultat.totalKostnad)}</div>
+                                </div>
+                            </div>
+                        </div>
+                `;
+                
+                // Visualisera varje planka
+                bastaResultat.plankor.forEach((planka, index) => {
+                    const plankaLangd = bastaResultat.lagerLangd;
+                    const segments = planka.map(bit => {
+                        const artikel = app.artiklar.find(a => a.id === bit.artikelId);
+                        return {
+                            langd: bit.langd,
+                            namn: artikel ? artikel.namn : ''
+                        };
+                    });
+                    
+                    // Beräkna spill
+                    const utnyttjadLangd = segments.reduce((sum, segment) => sum + segment.langd, 0);
+                    const spillLangd = plankaLangd - utnyttjadLangd;
+                    
+                    html += `
+                        <div class="planka">
+                            <div class="planka-info">Planka ${index + 1} - ${formatLength(plankaLangd)}</div>
+                            <div class="planka-segments">
+                    `;
+                    
+                    // Visualisera bitarna i plankan
+                    segments.forEach(segment => {
+                        const bredde = (segment.langd / plankaLangd) * 100;
+                        html += `
+                            <div class="segment virke" style="width: ${bredde}%;" title="${segment.namn}: ${segment.langd} mm">
+                                ${segment.langd}
+                            </div>
+                        `;
+                    });
+                    
+                    // Visualisera spill
+                    if (spillLangd > 0) {
+                        const spillBredde = (spillLangd / plankaLangd) * 100;
+                        html += `
+                            <div class="segment spill" style="width: ${spillBredde}%;" title="Spill: ${spillLangd} mm">
+                                ${spillLangd}
+                            </div>
+                        `;
+                    }
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            });
+            
+            // Uppdatera sammanfattningen
+            document.getElementById('total-plankor').textContent = totalPlankor;
+            document.getElementById('total-kostnad').textContent = formatPrice(totalKostnad);
+            document.getElementById('total-langd').textContent = (totalLangd / 1000).toFixed(2).replace('.', ',') + ' m';
+            document.getElementById('total-spill').textContent = (totalSpill / 1000).toFixed(2).replace('.', ',') + ' m (' + formatPercentage(totalSpill, totalLangd) + ')';
+            
+            // Visa resultatet
+            results.innerHTML = html || `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Ingen optimal kapning kunde hittas. Kontrollera att du har definierat lagerlängder för alla dimensioner.
+                </div>
+            `;
+            
+            // Byt till resultat-fliken
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            
+            document.querySelector('.tab[data-tab="resultat"]').classList.add('active');
+            document.getElementById('resultat-content').classList.add('active');
+        }
+        
+        function optimerKapning(behovdaLangder, lagerLangd, lagerPris, metod) {
+            // Kopiera behövda längder för att inte påverka originalet
+            const langder = [...behovdaLangder];
+            const plankor = [];
+            let totalKostnad = 0;
+            let totalLangd = 0;
+            let totalSpill = 0;
+            
+            // First-Fit Decreasing algoritm
+            while (langder.length > 0) {
+                const nyPlanka = [];
+                let aterstaendeLangd = lagerLangd;
+                
+                // Försök fylla plankan med så många bitar som möjligt
+                let i = 0;
+                while (i < langder.length) {
+                    if (langder[i].langd <= aterstaendeLangd) {
+                        nyPlanka.push(langder[i]);
+                        aterstaendeLangd -= langder[i].langd;
+                        langder.splice(i, 1);
+                    } else {
+                        i++;
+                    }
+                }
+                
+                // Lägg till plankan och uppdatera statistik
+                plankor.push(nyPlanka);
+                totalLangd += lagerLangd;
+                totalSpill += aterstaendeLangd;
+                totalKostnad += (lagerLangd / 1000) * lagerPris;
+            }
+            
+            return {
+                plankor: plankor,
+                totalLangd: totalLangd,
+                totalSpill: totalSpill,
+                totalKostnad: totalKostnad
+            };
+        }
+        
+        // Modal-hanterare
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        // Projekt-hantering
+        function saveProjekt() {
+            const projektNamn = document.getElementById('projekt-namn').value.trim();
+            
+            if (!projektNamn) {
+                alert('Vänligen ange ett projektnamn.');
+                return;
+            }
+            
+            const projekt = {
+                namn: projektNamn,
+                skapad: new Date().toISOString(),
+                artiklar: app.artiklar,
+                lagerLangder: app.lagerLangder
+            };
+            
+            // Hämta befintliga projekt
+            let sparadeProjekt = JSON.parse(localStorage.getItem('virke-projekt') || '[]');
+            
+            // Kontrollera om ett projekt med samma namn redan finns
+            const existingIndex = sparadeProjekt.findIndex(p => p.namn === projektNamn);
+            if (existingIndex !== -1) {
+                if (confirm(`Projekt "${projektNamn}" finns redan. Vill du ersätta det?`)) {
+                    sparadeProjekt[existingIndex] = projekt;
+                } else {
+                    return;
+                }
+            } else {
+                sparadeProjekt.push(projekt);
+            }
+            
+            // Spara och uppdatera projektlistan
+            localStorage.setItem('virke-projekt', JSON.stringify(sparadeProjekt));
+            updateProjektList();
+            
+            alert(`Projekt "${projektNamn}" har sparats.`);
+        }
+        
+        function loadProjekt(projektNamn) {
+            if (!confirm(`Vill du ladda projekt "${projektNamn}"? Nuvarande projekt kommer att ersättas.`)) {
+                return;
+            }
+            
+            const sparadeProjekt = JSON.parse(localStorage.getItem('virke-projekt') || '[]');
+            const projekt = sparadeProjekt.find(p => p.namn === projektNamn);
+            
+            if (projekt) {
+                app.artiklar = projekt.artiklar;
+                app.lagerLangder = projekt.lagerLangder;
+                
+                // Återställ lastId
+                app.lastId = app.artiklar.reduce((max, artikel) => Math.max(max, artikel.id), 0);
+                
+                // Uppdatera UI
+                updateArtikelList();
+                updateDimensionFilter();
+                updateLagerList();
+                
+                document.getElementById('projekt-namn').value = projekt.namn;
+                
+                alert(`Projekt "${projektNamn}" har laddats.`);
+            }
+        }
+        
+        function deleteProjekt(projektNamn) {
+            if (!confirm(`Är du säker på att du vill ta bort projekt "${projektNamn}"?`)) {
+                return;
+            }
+            
+            let sparadeProjekt = JSON.parse(localStorage.getItem('virke-projekt') || '[]');
+            sparadeProjekt = sparadeProjekt.filter(p => p.namn !== projektNamn);
+            
+            localStorage.setItem('virke-projekt', JSON.stringify(sparadeProjekt));
+            updateProjektList();
+            
+            alert(`Projekt "${projektNamn}" har tagits bort.`);
+        }
+        
+        function updateProjektList() {
+            const container = document.getElementById('saved-projects');
+            const sparadeProjekt = JSON.parse(localStorage.getItem('virke-projekt') || '[]');
+            
+            if (sparadeProjekt.length === 0) {
+                container.innerHTML = '<p>Inga sparade projekt hittades.</p>';
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>Projektnamn</th><th>Skapad</th><th>Åtgärder</th></tr></thead><tbody>';
+            
+            sparadeProjekt.forEach(projekt => {
+                const datumText = new Date(projekt.skapad).toLocaleDateString('sv-SE');
+                
+                html += `
+                    <tr>
+                        <td>${projekt.namn}</td>
+                        <td>${datumText}</td>
+                        <td class="actions">
+                            <button class="small" onclick="loadProjekt('${projekt.namn}')">
+                                <i class="fas fa-folder-open"></i> Ladda
+                            </button>
+                            <button class="small danger" onclick="deleteProjekt('${projekt.namn}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function exportProjekt() {
+            const projektNamn = document.getElementById('projekt-namn').value.trim() || 'Virke-Projekt';
+            
+            const projekt = {
+                namn: projektNamn,
+                skapad: new Date().toISOString(),
+                artiklar: app.artiklar,
+                lagerLangder: app.lagerLangder
+            };
+            
+            const json = JSON.stringify(projekt, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${projektNamn}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+        }
+        
+        function importProjekt() {
+            const fileInput = document.getElementById('import-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Vänligen välj en fil först.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const projekt = JSON.parse(e.target.result);
+                    
+                    if (!projekt.artiklar || !projekt.lagerLangder) {
+                        throw new Error('Ogiltig projektfil.');
+                    }
+                    
+                    if (confirm(`Vill du importera projekt "${projekt.namn}"? Nuvarande projekt kommer att ersättas.`)) {
+                        app.artiklar = projekt.artiklar;
+                        app.lagerLangder = projekt.lagerLangder;
+                        
+                        // Återställ lastId
+                        app.lastId = app.artiklar.reduce((max, artikel) => Math.max(max, artikel.id), 0);
+                        
+                        // Uppdatera UI
+                        updateArtikelList();
+                        updateDimensionFilter();
+                        updateLagerList();
+                        
+                        document.getElementById('projekt-namn').value = projekt.namn;
+                        
+                        alert(`Projekt "${projekt.namn}" har importerats.`);
+                    }
+                } catch (error) {
+                    alert('Det uppstod ett fel vid import: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Persistens
+        function saveToLocalStorage() {
+            localStorage.setItem('virke-app-data', JSON.stringify({
+                artiklar: app.artiklar,
+                lagerLangder: app.lagerLangder,
+                lastId: app.lastId
+            }));
+        }
+        
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('virke-app-data');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                app.artiklar = data.artiklar || [];
+                app.lagerLangder = data.lagerLangder || {};
+                app.lastId = data.lastId || 0;
+                
+                updateArtikelList();
+                updateDimensionFilter();
+                updateLagerList();
+            }
+            
+            updateProjektList();
+        }
     </script>
-</head>
-<body>
-    <h2>Virke och Kapningsberäknare</h2>
-    <div class="container">
-        <input type="text" id="artikel-namn" placeholder="Artikelnamn (dimension) t.ex. 45x95" />
-        <input type="number" id="behov-antal" placeholder="Behov (antal stycken)" />
-        <input type="number" id="behov-langd" placeholder="Behövd längd per styck (mm)" />
-
-        <div id="lager-container"></div>
-        <button onclick="addLagerInput()">+ Lägg till lagerlängd och pris</button>
-
-        <button onclick="addArtikel()">Lägg till artikel</button>
-        <ul id="artikel-lista"></ul>
-
-        <button onclick="calculateCuts()">Beräkna kapning</button>
-    </div>
-
-    <h3>Resultat</h3>
-    <div id="output"></div>
 </body>
 </html>
