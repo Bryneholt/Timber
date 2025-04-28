@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virke och Kapningsberäknare</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+            color: #333;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        h2, h3, h4 {
+            color: #222;
+        }
+        .container {
+            background: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        input, button {
+            padding: 8px;
+            margin-top: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .planka {
+            display: inline-block;
+            background-color: #4caf50;
+            color: white;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 4px;
+        }
+        .spill {
+            background-color: #f44336;
+        }
+        .lager-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .lager-inputs input {
+            flex: 1;
+        }
+    </style>
+    <script>
+        let artiklar = [];
+
+        function addLagerInput() {
+            const lagerContainer = document.getElementById('lager-container');
+            const div = document.createElement('div');
+            div.className = 'lager-inputs';
+            div.innerHTML = '<input type="number" placeholder="Längd (mm)" class="lager-langd" />' +
+                            '<input type="number" placeholder="Pris per meter (kr)" class="lager-pris" />';
+            lagerContainer.appendChild(div);
+        }
+
+        function addArtikel() {
+            const namn = document.getElementById('artikel-namn').value;
+            const antal = parseInt(document.getElementById('behov-antal').value);
+            const langd = parseInt(document.getElementById('behov-langd').value);
+            const lagerInputs = document.querySelectorAll('.lager-inputs');
+
+            let lagerLangder = [];
+            lagerInputs.forEach(div => {
+                const langdInput = div.querySelector('.lager-langd').value;
+                const prisInput = div.querySelector('.lager-pris').value;
+                if(langdInput && prisInput) {
+                    lagerLangder.push({ langd: parseInt(langdInput), pris: parseFloat(prisInput) });
+                }
+            });
+
+            artiklar.push({ namn, antal, langd, lagerLangder });
+
+            const lista = document.getElementById('artikel-lista');
+            lista.innerHTML += `<li>${namn}: ${antal} st á ${langd} mm</li>`;
+
+            document.getElementById('artikel-namn').value = '';
+            document.getElementById('behov-antal').value = '';
+            document.getElementById('behov-langd').value = '';
+            document.getElementById('lager-container').innerHTML = '';
+        }
+
+        function calculateCuts() {
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+
+            artiklar.forEach((artikel, index) => {
+                output.innerHTML += `<div class="container">
+                <h4>Artikel ${index + 1}: ${artikel.namn} (${artikel.antal} st á ${artikel.langd} mm)</h4>`;
+
+                artikel.lagerLangder.sort((a, b) => b.langd - a.langd);
+
+                artikel.lagerLangder.forEach(lager => {
+                    const antalPerPlanka = Math.floor(lager.langd / artikel.langd);
+                    if (antalPerPlanka > 0) {
+                        const plankorSomBehovs = Math.ceil(artikel.antal / antalPerPlanka);
+                        const totaltSvinn = (lager.langd - (antalPerPlanka * artikel.langd)) * plankorSomBehovs;
+                        const totalPris = plankorSomBehovs * (lager.langd / 1000) * lager.pris;
+
+                        let grafik = '';
+                        for (let i = 0; i < antalPerPlanka; i++) grafik += `<span class="planka">${artikel.langd}</span>`;
+                        grafik += `<span class="planka spill">${lager.langd - (antalPerPlanka * artikel.langd)}</span>`;
+
+                        output.innerHTML += `<div>
+                            <strong>${plankorSomBehovs} st</strong> á <strong>${lager.langd} mm</strong><br>
+                            Svinn: <strong>${totaltSvinn} mm</strong>, Kostnad: <strong>${totalPris.toFixed(2)} kr</strong>
+                            <div>${grafik}</div>
+                        </div>`;
+                    }
+                });
+
+                output.innerHTML += `</div>`;
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2>Virke och Kapningsberäknare</h2>
+    <div class="container">
+        <input type="text" id="artikel-namn" placeholder="Artikelnamn (dimension) t.ex. 45x95" />
+        <input type="number" id="behov-antal" placeholder="Behov (antal stycken)" />
+        <input type="number" id="behov-langd" placeholder="Behövd längd per styck (mm)" />
+
+        <div id="lager-container"></div>
+        <button onclick="addLagerInput()">+ Lägg till lagerlängd och pris</button>
+
+        <button onclick="addArtikel()">Lägg till artikel</button>
+        <ul id="artikel-lista"></ul>
+
+        <button onclick="calculateCuts()">Beräkna kapning</button>
+    </div>
+
+    <h3>Resultat</h3>
+    <div id="output"></div>
+</body>
+</html>
