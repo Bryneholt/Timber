@@ -3,6 +3,8 @@
 import { TimberCalculator } from './app.js';
 import { CONFIG } from '../data/config.js';
 import { UIComponents } from '../components/UIComponents.js';
+import { DataManager } from '../components/DataManager.js';
+import { CompanySelector } from '../components/CompanySelector.js';
 
 /**
  * Initialize the application when DOM is loaded
@@ -20,6 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
     window.app.loadProjekt = window.app.loadProjekt.bind(window.app);
     window.app.deleteProjekt = window.app.deleteProjekt.bind(window.app);
     window.app.deleteLagerLangd = window.app.deleteLagerLangd.bind(window.app);
+    
+    // Initialize data manager
+    initializeDataManager();
+    
+    // Initialize company selector
+    initializeCompanySelector();
 });
 
 /**
@@ -42,5 +50,28 @@ function initializeDropdowns() {
     const standardLengthsContainer = document.getElementById('standard-lengths-container');
     if (standardLengthsContainer) {
         standardLengthsContainer.innerHTML = UIComponents.renderStandardLengthButtons(CONFIG.STANDARD_LENGTHS);
+    }
+}
+
+/**
+ * Initialize the data manager component
+ */
+function initializeDataManager() {
+    const dataManagerContainer = document.getElementById('data-manager-container');
+    if (dataManagerContainer) {
+        dataManagerContainer.innerHTML = DataManager.renderDataManager();
+    }
+}
+
+/**
+ * Initialize the company selector component
+ */
+function initializeCompanySelector() {
+    const companySelectorContainer = document.getElementById('company-selector-container');
+    if (companySelectorContainer) {
+        companySelectorContainer.innerHTML = CompanySelector.renderCompanySelector('hornbach', (companyId) => {
+            // Handle company selection change
+            console.log('Company selected:', companyId);
+        });
     }
 }
