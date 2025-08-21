@@ -5,6 +5,7 @@ import { generateId, getDimensionFromArtikelnamn, validateArtikel, validateLager
 import { calculateOverallStatistics } from './optimizer.js';
 import { StorageService } from './storage.js';
 import { UIComponents } from '../components/UIComponents.js';
+import { getAvailableLengths } from '../data/scraped_materials.js';
 
 /**
  * Main application class
@@ -41,6 +42,7 @@ export class TimberCalculator {
         document.getElementById('dimension-select').addEventListener('change', (e) => {
             if (e.target.value) {
                 document.getElementById('artikel-namn').value = e.target.value;
+                this.populateAvailableLengths(e.target.value);
             }
         });
         
@@ -191,6 +193,37 @@ export class TimberCalculator {
         document.getElementById('behov-antal').value = '';
         document.getElementById('behov-langd').value = '';
         document.getElementById('dimension-select').selectedIndex = 0;
+    }
+
+    /**
+     * Populate available lengths for a given dimension
+     */
+    populateAvailableLengths(dimension) {
+        try {
+            const availableLengths = getAvailableLengths(dimension);
+            const standardLengthsContainer = document.getElementById('standard-lengths-container');
+            
+            if (standardLengthsContainer && availableLengths.length > 0) {
+                let html = '<h4>Tillgängliga längder för ' + dimension + ':</h4>';
+                html += '<div class="standard-lengths">';
+                
+                availableLengths.forEach(length => {
+                    html += `<button type="button" class="length-btn" data-length="${length}">${length} mm</button>`;
+                });
+                
+                html += '</div>';
+                standardLengthsContainer.innerHTML = html;
+                
+                // Add event listeners to length buttons
+                standardLengthsContainer.querySelectorAll('.length-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.getElementById('behov-langd').value = btn.dataset.length;
+                    });
+                });
+            }
+        } catch (error) {
+            console.log('Could not load available lengths:', error);
+        }
     }
 
     /**

@@ -827,3 +827,37 @@ tr:hover {
     padding-top: 20px;
     border-top: 1px solid #e9ecef;
 }
+
+/* Length buttons */
+.length-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #007bff;
+    background: #fff;
+    color: #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.length-btn:hover {
+    background: #007bff;
+    color: #fff;
+}
+
+.length-btn:active {
+    transform: translateY(1px);
+}
+
+#standard-lengths-container h4 {
+    margin: 1rem 0 0.5rem 0;
+    color: #495057;
+    font-size: 1rem;
+}
+
+#standard-lengths-container .standard-lengths {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}

@@ -367,13 +367,15 @@ class MaterialScraper:
             if price <= 0:
                 return None
             
-            # Extract dimension from name
+            # Extract dimension and length from name
             dimension = self.extract_dimension_from_name(name)
+            length = self.extract_length_from_name(name)
             
             return {
                 'name': name.strip(),
                 'price': float(price),
                 'dimension': dimension,
+                'length': length,
                 'category': category_id,
                 'company': company_id,
                 'scraped_at': datetime.now().isoformat()
@@ -388,6 +390,15 @@ class MaterialScraper:
         dimension_match = re.search(r'(\d+)x(\d+)', name, re.IGNORECASE)
         if dimension_match:
             return f"{dimension_match.group(1)}x{dimension_match.group(2)}"
+        
+        return None
+
+    def extract_length_from_name(self, name):
+        """Extract length from product name"""
+        # Look for length patterns like "x4800 mm", "x3600mm", etc.
+        length_match = re.search(r'x(\d+)\s*mm', name, re.IGNORECASE)
+        if length_match:
+            return int(length_match.group(1))
         
         return None
 
