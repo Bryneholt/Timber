@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A comprehensive Swedish timber and cutting optimization calculator",
   "main": "index.html",
+  "type": "module",
   "scripts": {
     "start": "python3 -m http.server 8000",
     "dev": "python3 -m http.server 8000",
@@ -28,12 +29,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/smart-virke-kapningsberaknare.git"
+    "url": "https://github.com/Bryneholt/Timber.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/smart-virke-kapningsberaknare/issues"
+    "url": "https://github.com/Bryneholt/Timber/issues"
   },
-  "homepage": "https://github.com/yourusername/smart-virke-kapningsberaknare#readme",
+  "homepage": "https://bryneholt.github.io/Timber/",
   "devDependencies": {},
   "dependencies": {},
   "engines": {

@@ -38,9 +38,18 @@ function initializeDropdowns() {
     // Initialize standard dimensions dropdown with Hornbach material data
     const dimensionSelect = document.getElementById('dimension-select');
     if (dimensionSelect) {
-        const hornbachMaterials = getCompanyMaterials('hornbach');
-        const dimensions = [...new Set(hornbachMaterials.map(m => m.dimension))].sort();
-        dimensionSelect.innerHTML = UIComponents.renderDimensionsFromMaterials(dimensions);
+        try {
+            const hornbachMaterials = getCompanyMaterials('hornbach');
+            console.log('✅ Loaded Hornbach materials:', hornbachMaterials.length);
+            const dimensions = [...new Set(hornbachMaterials.map(m => m.dimension))].sort();
+            console.log('📏 Available dimensions:', dimensions);
+            dimensionSelect.innerHTML = UIComponents.renderDimensionsFromMaterials(dimensions);
+            console.log('🎯 Dropdown populated successfully');
+        } catch (error) {
+            console.error('❌ Error initializing dropdown:', error);
+            // Fallback to CONFIG if scraped materials fail
+            dimensionSelect.innerHTML = UIComponents.renderStandardDimensionsDropdown(CONFIG.STANDARD_DIMENSIONS);
+        }
     }
     
     // Initialize optimization strategies dropdown
