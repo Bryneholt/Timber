@@ -808,12 +808,24 @@ export class TimberCalculator {
             <head>
                 <title>Kapguide - Virke</title>
                 <style>
+                    :root {
+                        --primary: #18181b;
+                        --accent: #f97316;
+                        --error: #ef4444;
+                    }
                     body { font-family: Arial, sans-serif; margin: 20px; }
                     h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
-                    .plank { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
-                    .cuts { margin: 10px 0; }
-                    .cut-item { padding: 5px 0; border-bottom: 1px dotted #ccc; }
-                    .summary { background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                    h2 { color: var(--accent); margin-top: 30px; }
+                    .plank-guide { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+                    .planka-segments { display: flex; height: 40px; margin: 10px 0; border: 1px solid #ccc; }
+                    .segment { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap; padding: 0 5px; }
+                    .segment.virke { background-color: var(--primary); }
+                    .segment.spill { background-color: var(--error); }
+                    .cut-line { width: 2px; height: 100%; background-color: #dc2626; position: relative; flex-shrink: 0; box-shadow: 0 0 3px rgba(220, 38, 38, 0.5); }
+                    .cut-line::before { content: '✂'; position: absolute; top: -8px; left: -6px; font-size: 12px; color: #dc2626; }
+                    .cut-instructions { margin-top: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; }
+                    .cut-instruction { padding: 5px 0; border-bottom: 1px dotted #ccc; }
+                    .waste-note { margin-top: 10px; padding: 8px; background: #fff2f2; border: 1px solid #fecaca; border-radius: 4px; color: #991b1b; }
                     .footer { margin-top: 30px; font-size: 12px; color: #666; }
                     @media print { .no-print { display: none; } }
                 </style>
@@ -837,12 +849,17 @@ export class TimberCalculator {
         const results = this.lastCalculationResults;
         let html = '<h1>📋 Inköpslista</h1>';
         
+        // Calculate efficiency
+        const totalUsedLength = results.totalLangd - results.totalSpill;
+        const efficiency = (totalUsedLength / results.totalLangd) * 100;
+        
         // Summary
         html += '<div class="summary">';
         html += '<h3>Sammanfattning</h3>';
-        html += `<p><strong>Total kostnad:</strong> ${results.totalCost.toFixed(2).replace('.', ',')} kr</p>`;
-        html += `<p><strong>Totalt spill:</strong> ${(results.totalWaste / 1000).toFixed(2).replace('.', ',')} m</p>`;
-        html += `<p><strong>Utnyttjande:</strong> ${results.efficiency.toFixed(1)}%</p>`;
+        html += `<p><strong>Total kostnad:</strong> ${results.totalKostnad.toFixed(2).replace('.', ',')} kr</p>`;
+        html += `<p><strong>Totalt spill:</strong> ${(results.totalSpill / 1000).toFixed(2).replace('.', ',')} m</p>`;
+        html += `<p><strong>Utnyttjande:</strong> ${efficiency.toFixed(1)}%</p>`;
+        html += `<p><strong>Antal plankor:</strong> ${results.totalPlankor} st</p>`;
         html += '</div>';
 
         // Shopping list by dimension
@@ -858,7 +875,7 @@ export class TimberCalculator {
                 result.plankor.forEach(planka => {
                     const langd = result.lagerLangd;
                     if (!byLength[langd]) {
-                        byLength[langd] = { count: 0, price: planka.prisPerMeter || 25 };
+                        byLength[langd] = { count: 0, price: result.lagerPris || 25 };
                     }
                     byLength[langd].count++;
                 });
@@ -866,7 +883,7 @@ export class TimberCalculator {
                 Object.entries(byLength).forEach(([langd, info]) => {
                     const totalCost = (info.count * (langd / 1000) * info.price);
                     html += `<tr>`;
-                    html += `<td>${dimension} mm</td>`;
+                    html += `<td>${dimension}</td>`;
                     html += `<td>${langd} mm</td>`;
                     html += `<td>${info.count} st</td>`;
                     html += `<td>${info.price.toFixed(2).replace('.', ',')} kr/m</td>`;
@@ -881,7 +898,7 @@ export class TimberCalculator {
     }
 
     /**
-     * Generate cutting guide HTML
+     * Generate cutting guide HTML with visual diagrams
      */
     generateCuttingGuide() {
         const results = this.lastCalculationResults;
@@ -889,30 +906,80 @@ export class TimberCalculator {
         
         Object.entries(results.dimensionResults).forEach(([dimension, result]) => {
             if (!result.error && result.plankor) {
-                html += `<h2>${dimension} mm</h2>`;
+                html += `<h2>${dimension}</h2>`;
+                html += `<p><strong>Lagerlängd:</strong> ${result.lagerLangd} mm | <strong>Pris:</strong> ${result.lagerPris.toFixed(2)} kr/m</p>`;
                 
                 result.plankor.forEach((planka, index) => {
-                    html += `<div class="plank">`;
-                    html += `<h4>Planka ${index + 1} (${result.lagerLangd} mm)</h4>`;
-                    html += `<div class="cuts">`;
-                    
+                    // Calculate segments for visualization
                     let currentPosition = 0;
-                    planka.forEach((bit, bitIndex) => {
+                    const segments = [];
+                    
+                    planka.forEach(bit => {
                         const artikel = this.artiklar.find(a => a.id === bit.artikelId);
-                        const actualLength = artikel ? artikel.originalLangd || bit.langd : bit.langd;
-                        const spillAmount = artikel ? artikel.spillMargin || 0 : 0;
-                        
-                        html += `<div class="cut-item">`;
-                        html += `${bitIndex + 1}. Kapa ${actualLength} mm (+ ${spillAmount} mm spill) från position ${currentPosition} mm`;
-                        html += `<br><em>${artikel ? artikel.namn : 'Okänd artikel'}</em>`;
-                        html += `</div>`;
-                        
+                        segments.push({
+                            langd: bit.langd,
+                            namn: artikel ? artikel.namn : 'Okänd artikel',
+                            artikelId: bit.artikelId
+                        });
                         currentPosition += bit.langd;
                     });
                     
-                    const waste = result.lagerLangd - currentPosition;
-                    if (waste > 0) {
-                        html += `<div class="cut-item"><strong>Kvar: ${waste} mm (spill)</strong></div>`;
+                    const spillLangd = result.lagerLangd - currentPosition;
+                    
+                    // Generate visual diagram
+                    html += `<div class="plank-guide">`;
+                    html += `<h4>Planka ${index + 1} - ${result.lagerLangd} mm</h4>`;
+                    html += `<div class="planka-segments">`;
+                    
+                    // Visualize pieces with cut lines
+                    segments.forEach((segment, segmentIndex) => {
+                        const bredde = (segment.langd / result.lagerLangd) * 100;
+                        html += `
+                            <div class="segment virke" style="width: ${bredde}%;" title="${segment.namn}: ${segment.langd} mm">
+                                ${segment.langd}
+                            </div>
+                        `;
+                        
+                        // Add red cut line between segments (except after last segment)
+                        if (segmentIndex < segments.length - 1) {
+                            html += `<div class="cut-line" title="Kap här"></div>`;
+                        }
+                    });
+                    
+                    // Visualize waste
+                    if (spillLangd > 0) {
+                        const spillBredde = (spillLangd / result.lagerLangd) * 100;
+                        html += `
+                            <div class="segment spill" style="width: ${spillBredde}%;" title="Spill: ${spillLangd} mm">
+                                ${spillLangd}
+                            </div>
+                        `;
+                    }
+                    
+                    html += `</div>`;
+                    
+                    // Add cutting instructions
+                    html += `<div class="cut-instructions">`;
+                    html += `<h5>Kapinstruktioner:</h5>`;
+                    let position = 0;
+                    segments.forEach((segment, segmentIndex) => {
+                        const artikel = this.artiklar.find(a => a.id === segment.artikelId);
+                        const spillAmount = artikel ? artikel.spillMargin || 0 : 0;
+                        const originalLength = artikel ? artikel.originalLangd || segment.langd : segment.langd;
+                        
+                        html += `<div class="cut-instruction">`;
+                        html += `${segmentIndex + 1}. Mät från ${position} mm, kapa ${originalLength} mm`;
+                        if (spillAmount > 0) {
+                            html += ` (inkl. ${spillAmount} mm spill)`;
+                        }
+                        html += `<br><em>Artikel: ${segment.namn}</em>`;
+                        html += `</div>`;
+                        
+                        position += segment.langd;
+                    });
+                    
+                    if (spillLangd > 0) {
+                        html += `<div class="waste-note"><strong>Kvarvarande spill:</strong> ${spillLangd} mm</div>`;
                     }
                     
                     html += `</div></div>`;
