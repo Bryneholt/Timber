@@ -1,10 +1,10 @@
 // Main application class for the Timber Calculator
 
 import { CONFIG, MESSAGES } from '../data/config.js';
-import { generateId, getDimensionFromArtikelnamn, validateArtikel, validateLagerLangd, showAlert, confirmDialog } from './utils.js';
+import { generateId, getDimensionFromArtikelnamn, validateArtikel, validateLagerLangd, showAlert, confirmDialog, formatLength, formatPrice, formatPercentage } from './utils.js';
+import { UIComponents } from '../components/UIComponents.js';
 import { calculateOverallStatistics } from './optimizer.js';
 import { StorageService } from './storage.js';
-import { UIComponents } from '../components/UIComponents.js';
 import { getAvailableLengths } from '../data/scraped_materials.js';
 
 /**
@@ -761,8 +761,17 @@ export class TimberCalculator {
             return;
         }
 
-        const shoppingList = this.generateShoppingList();
-        const printWindow = window.open('', '_blank');
+        console.log('🛒 Print shopping list called with results:', this.lastCalculationResults);
+        
+        try {
+            const shoppingList = this.generateShoppingList();
+            console.log('✅ Generated shopping list HTML:', shoppingList.substring(0, 200));
+            
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showAlert('Popup blockad av webbläsaren. Tillåt popups för denna sida.', 'error');
+                return;
+            }
         printWindow.document.write(`
             <!DOCTYPE html>
             <html>
@@ -788,7 +797,11 @@ export class TimberCalculator {
             </body>
             </html>
         `);
-        printWindow.document.close();
+            printWindow.document.close();
+        } catch (error) {
+            console.error('❌ Error generating shopping list:', error);
+            showAlert('Fel vid generering av inköpslista: ' + error.message, 'error');
+        }
     }
 
     /**
@@ -800,8 +813,17 @@ export class TimberCalculator {
             return;
         }
 
-        const cuttingGuide = this.generateCuttingGuide();
-        const printWindow = window.open('', '_blank');
+        console.log('✂️ Print cutting guide called with results:', this.lastCalculationResults);
+        
+        try {
+            const cuttingGuide = this.generateCuttingGuide();
+            console.log('✅ Generated cutting guide HTML:', cuttingGuide.substring(0, 200));
+            
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showAlert('Popup blockad av webbläsaren. Tillåt popups för denna sida.', 'error');
+                return;
+            }
         printWindow.document.write(`
             <!DOCTYPE html>
             <html>
@@ -810,23 +832,42 @@ export class TimberCalculator {
                 <style>
                     :root {
                         --primary: #18181b;
+                        --primary-light: #27272a;
+                        --secondary: #71717a;
+                        --light-grey: #fafafa;
                         --accent: #f97316;
                         --error: #ef4444;
                     }
-                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    
+                    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
                     h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
                     h2 { color: var(--accent); margin-top: 30px; }
-                    .plank-guide { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
-                    .planka-segments { display: flex; height: 40px; margin: 10px 0; border: 1px solid #ccc; }
-                    .segment { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap; padding: 0 5px; }
+                    
+                    /* Kapning container styles */
+                    .kapning-container { margin: 30px 0; }
+                    .summary-box { padding: 15px; border-radius: 8px; background-color: var(--light-grey); margin-bottom: 15px; border-left: 4px solid var(--primary); }
+                    .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; background-color: var(--primary-light); color: white; }
+                    
+                    /* Plank visualization styles */
+                    .planka { border-radius: 4px; margin-bottom: 15px; position: relative; background-color: #f5f5f5; border: 1px solid #ddd; overflow: hidden; }
+                    .planka-info { background: var(--secondary); color: white; padding: 4px 8px; font-size: 12px; position: absolute; top: 0; right: 0; border-bottom-left-radius: 4px; }
+                    .planka-segments { display: flex; height: 40px; }
+                    .segment { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 5px; }
                     .segment.virke { background-color: var(--primary); }
                     .segment.spill { background-color: var(--error); }
+                    .segment.waste { background-color: #f44336; }
+                    
+                    /* Cut line styles */
                     .cut-line { width: 2px; height: 100%; background-color: #dc2626; position: relative; flex-shrink: 0; box-shadow: 0 0 3px rgba(220, 38, 38, 0.5); }
                     .cut-line::before { content: '✂'; position: absolute; top: -8px; left: -6px; font-size: 12px; color: #dc2626; }
-                    .cut-instructions { margin-top: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; }
-                    .cut-instruction { padding: 5px 0; border-bottom: 1px dotted #ccc; }
-                    .waste-note { margin-top: 10px; padding: 8px; background: #fff2f2; border: 1px solid #fecaca; border-radius: 4px; color: #991b1b; }
-                    .footer { margin-top: 30px; font-size: 12px; color: #666; }
+                    
+                    /* Instruction styles */
+                    .cut-instructions { margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e5e5e5; }
+                    .cut-instruction { padding: 8px 0; border-bottom: 1px dotted #ccc; }
+                    .cut-instruction:last-child { border-bottom: none; }
+                    .waste-note { margin-top: 10px; padding: 8px; background: #fff2f2; border: 1px solid #fecaca; border-radius: 4px; color: #991b1b; font-weight: 500; }
+                    
+                    .footer { margin-top: 30px; font-size: 12px; color: #666; border-top: 1px solid #ddd; padding-top: 10px; }
                     @media print { .no-print { display: none; } }
                 </style>
             </head>
@@ -839,7 +880,11 @@ export class TimberCalculator {
             </body>
             </html>
         `);
-        printWindow.document.close();
+            printWindow.document.close();
+        } catch (error) {
+            console.error('❌ Error generating cutting guide:', error);
+            showAlert('Fel vid generering av kapguide: ' + error.message, 'error');
+        }
     }
 
     /**
@@ -898,7 +943,7 @@ export class TimberCalculator {
     }
 
     /**
-     * Generate cutting guide HTML with visual diagrams
+     * Generate cutting guide HTML with visual diagrams (same as web interface)
      */
     generateCuttingGuide() {
         const results = this.lastCalculationResults;
@@ -906,84 +951,48 @@ export class TimberCalculator {
         
         Object.entries(results.dimensionResults).forEach(([dimension, result]) => {
             if (!result.error && result.plankor) {
-                html += `<h2>${dimension}</h2>`;
+                // Use the same structure as UIComponents.renderDimensionResults
+                html += `<div class="kapning-container">`;
+                html += `<h2>Dimension: ${dimension} <span class="badge">${result.plankor.length} plankor</span></h2>`;
+                html += `<div class="summary-box">`;
                 html += `<p><strong>Lagerlängd:</strong> ${result.lagerLangd} mm | <strong>Pris:</strong> ${result.lagerPris.toFixed(2)} kr/m</p>`;
+                html += `<p><strong>Totalt spill:</strong> ${result.totalSpill} mm | <strong>Total kostnad:</strong> ${result.totalKostnad.toFixed(2)} kr</p>`;
+                html += `</div>`;
                 
+                // Use the exact same visualization as the web interface
                 result.plankor.forEach((planka, index) => {
-                    // Calculate segments for visualization
-                    let currentPosition = 0;
-                    const segments = [];
+                    html += UIComponents.renderPlankaVisualization(planka, result.lagerLangd, index, this.artiklar);
                     
-                    planka.forEach(bit => {
-                        const artikel = this.artiklar.find(a => a.id === bit.artikelId);
-                        segments.push({
-                            langd: bit.langd,
-                            namn: artikel ? artikel.namn : 'Okänd artikel',
-                            artikelId: bit.artikelId
-                        });
-                        currentPosition += bit.langd;
-                    });
-                    
-                    const spillLangd = result.lagerLangd - currentPosition;
-                    
-                    // Generate visual diagram
-                    html += `<div class="plank-guide">`;
-                    html += `<h4>Planka ${index + 1} - ${result.lagerLangd} mm</h4>`;
-                    html += `<div class="planka-segments">`;
-                    
-                    // Visualize pieces with cut lines
-                    segments.forEach((segment, segmentIndex) => {
-                        const bredde = (segment.langd / result.lagerLangd) * 100;
-                        html += `
-                            <div class="segment virke" style="width: ${bredde}%;" title="${segment.namn}: ${segment.langd} mm">
-                                ${segment.langd}
-                            </div>
-                        `;
-                        
-                        // Add red cut line between segments (except after last segment)
-                        if (segmentIndex < segments.length - 1) {
-                            html += `<div class="cut-line" title="Kap här"></div>`;
-                        }
-                    });
-                    
-                    // Visualize waste
-                    if (spillLangd > 0) {
-                        const spillBredde = (spillLangd / result.lagerLangd) * 100;
-                        html += `
-                            <div class="segment spill" style="width: ${spillBredde}%;" title="Spill: ${spillLangd} mm">
-                                ${spillLangd}
-                            </div>
-                        `;
-                    }
-                    
-                    html += `</div>`;
-                    
-                    // Add cutting instructions
+                    // Add cutting instructions below each plank
                     html += `<div class="cut-instructions">`;
-                    html += `<h5>Kapinstruktioner:</h5>`;
+                    html += `<h5>Kapinstruktioner för Planka ${index + 1}:</h5>`;
+                    
                     let position = 0;
-                    segments.forEach((segment, segmentIndex) => {
-                        const artikel = this.artiklar.find(a => a.id === segment.artikelId);
+                    planka.forEach((bit, bitIndex) => {
+                        const artikel = this.artiklar.find(a => a.id === bit.artikelId);
                         const spillAmount = artikel ? artikel.spillMargin || 0 : 0;
-                        const originalLength = artikel ? artikel.originalLangd || segment.langd : segment.langd;
+                        const originalLength = artikel ? artikel.originalLangd || bit.langd : bit.langd;
                         
                         html += `<div class="cut-instruction">`;
-                        html += `${segmentIndex + 1}. Mät från ${position} mm, kapa ${originalLength} mm`;
+                        html += `${bitIndex + 1}. Mät från ${position} mm, kapa ${originalLength} mm`;
                         if (spillAmount > 0) {
                             html += ` (inkl. ${spillAmount} mm spill)`;
                         }
-                        html += `<br><em>Artikel: ${segment.namn}</em>`;
+                        html += `<br><em>Artikel: ${artikel ? artikel.namn : 'Okänd artikel'}</em>`;
                         html += `</div>`;
                         
-                        position += segment.langd;
+                        position += bit.langd;
                     });
                     
-                    if (spillLangd > 0) {
-                        html += `<div class="waste-note"><strong>Kvarvarande spill:</strong> ${spillLangd} mm</div>`;
+                    const waste = result.lagerLangd - position;
+                    if (waste > 0) {
+                        html += `<div class="waste-note"><strong>Kvarvarande spill:</strong> ${waste} mm</div>`;
                     }
                     
-                    html += `</div></div>`;
+                    html += `</div>`;
                 });
+                
+                html += `</div>`;
             }
         });
         
