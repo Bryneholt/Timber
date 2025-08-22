@@ -34,6 +34,27 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     min-height: 100vh;
+    position: relative;
+}
+
+.version-indicator {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    background: var(--primary);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    z-index: 1000;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.version-indicator:hover {
+    opacity: 1;
 }
 
 h1, h2, h3, h4 {
