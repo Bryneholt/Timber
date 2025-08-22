@@ -287,13 +287,18 @@ export class UIComponents {
     }
 
     /**
-     * Categorize dimensions based on material names
+     * Categorize dimensions based on material names with detailed classification
      * @param {Array} materials - Array of material objects
      * @returns {Object} - Object with categories as keys and dimension arrays as values
      */
     static categorizeDimensions(materials) {
         const categories = {
-            'Reglar': new Set(),
+            'Tryckimpregnerat C24 Reglar': new Set(),
+            'Tryckimpregnerat Trall': new Set(),
+            'Tryckimpregnerat Stolpar': new Set(),
+            'Tryckimpregnerat Staket': new Set(),
+            'Konstruktionsvirke C24': new Set(),
+            'Reglar (standard)': new Set(),
             'Trall': new Set(),
             'Panel': new Set(),
             'Råspont': new Set(),
@@ -306,53 +311,96 @@ export class UIComponents {
         
         materials.forEach(material => {
             const name = material.name.toLowerCase();
+            const originalName = material.name;
             const dimension = material.dimension;
             let categoryFound = false;
             
-            if (name.includes('regel')) {
-                categories['Reglar'].add(dimension);
+            const isTryckimpregnerat = name.includes('tryckimpregnerat') || name.includes('tryckimpregnerad');
+            const isC24 = originalName.includes('C24');
+            const isC14 = originalName.includes('C14');
+            
+            // Tryckimpregnerat materials with C24 grade
+            if (isTryckimpregnerat && isC24 && name.includes('regel')) {
+                categories['Tryckimpregnerat C24 Reglar'].add(dimension);
                 categoryFound = true;
             }
-            if (name.includes('trall')) {
+            // Tryckimpregnerat trall (no grade needed)
+            else if (isTryckimpregnerat && name.includes('trall')) {
+                categories['Tryckimpregnerat Trall'].add(dimension);
+                categoryFound = true;
+            }
+            // Tryckimpregnerat stolpar
+            else if (isTryckimpregnerat && name.includes('stolpe')) {
+                categories['Tryckimpregnerat Stolpar'].add(dimension);
+                categoryFound = true;
+            }
+            // Tryckimpregnerat staket/ribba
+            else if (isTryckimpregnerat && (name.includes('staket') || name.includes('ribba'))) {
+                categories['Tryckimpregnerat Staket'].add(dimension);
+                categoryFound = true;
+            }
+            // Regular construction C24 (non-treated)
+            else if (!isTryckimpregnerat && isC24 && name.includes('regel')) {
+                categories['Konstruktionsvirke C24'].add(dimension);
+                categoryFound = true;
+            }
+            // Regular reglar (non-treated, no grade)
+            else if (!isTryckimpregnerat && name.includes('regel')) {
+                categories['Reglar (standard)'].add(dimension);
+                categoryFound = true;
+            }
+            // Regular trall (non-treated)
+            else if (!isTryckimpregnerat && name.includes('trall')) {
                 categories['Trall'].add(dimension);
                 categoryFound = true;
             }
-            if (name.includes('panel') || name.includes('ytterpanel')) {
+            // Panel materials
+            else if (name.includes('panel') || name.includes('ytterpanel')) {
                 categories['Panel'].add(dimension);
                 categoryFound = true;
             }
-            if (name.includes('råspont') || name.includes('spont')) {
+            // Råspont materials
+            else if (name.includes('råspont') || name.includes('spont')) {
                 categories['Råspont'].add(dimension);
                 categoryFound = true;
             }
-            if (name.includes('stolpe')) {
+            // Regular stolpar (non-treated)
+            else if (!isTryckimpregnerat && name.includes('stolpe')) {
                 categories['Stolpar'].add(dimension);
                 categoryFound = true;
             }
-            if (name.includes('läkt') || name.includes('lakt')) {
+            // Läkt materials
+            else if (name.includes('läkt') || name.includes('lakt')) {
                 categories['Läkt'].add(dimension);
                 categoryFound = true;
             }
-            if (name.includes('sockel') || name.includes('foder')) {
+            // Foder/Sockel materials
+            else if (name.includes('sockel') || name.includes('foder')) {
                 categories['Foder/Sockel'].add(dimension);
                 categoryFound = true;
             }
-            if (name.includes('staket') || name.includes('glespanel')) {
+            // Regular staket (non-treated)
+            else if (!isTryckimpregnerat && (name.includes('staket') || name.includes('glespanel'))) {
                 categories['Staket'].add(dimension);
                 categoryFound = true;
             }
             
+            // Everything else goes to Övrigt
             if (!categoryFound) {
                 categories['Övrigt'].add(dimension);
             }
         });
         
-        // Convert Sets to Arrays
-        Object.keys(categories).forEach(key => {
-            categories[key] = Array.from(categories[key]);
+        // Convert Sets to Arrays and remove empty categories
+        const result = {};
+        Object.entries(categories).forEach(([key, value]) => {
+            const dimensions = Array.from(value);
+            if (dimensions.length > 0) {
+                result[key] = dimensions;
+            }
         });
         
-        return categories;
+        return result;
     }
 
     /**
