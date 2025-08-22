@@ -327,11 +327,11 @@ tr:hover td {
 }
 
 .segment.spill {
-    background-color: var(--error);
+    background-color: #f59e0b;
 }
 
 .segment.waste {
-    background-color: #f44336;
+    background-color: #f59e0b;
 }
 
 .cut-line {

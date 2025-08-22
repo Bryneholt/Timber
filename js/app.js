@@ -860,8 +860,8 @@ export class TimberCalculator {
                     .segment { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 3px; min-width: 30px; position: relative; border-right: 1px solid rgba(255, 255, 255, 0.2); }
                     .segment:last-child { border-right: none; }
                     .segment.virke { background-color: var(--primary); }
-                    .segment.spill { background-color: var(--error); }
-                    .segment.waste { background-color: #f44336; }
+                    .segment.spill { background-color: #f59e0b; }
+                    .segment.waste { background-color: #f59e0b; }
                     
                     /* Cut line styles */
                     .cut-line { width: 2px; height: 100%; background-color: #dc2626; position: relative; flex-shrink: 0; box-shadow: 0 0 3px rgba(220, 38, 38, 0.5); }
