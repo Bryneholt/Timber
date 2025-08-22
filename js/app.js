@@ -843,20 +843,15 @@ export class TimberCalculator {
                     h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
                     h2 { color: var(--accent); margin-top: 30px; }
                     
-                    /* Compact material sections */
-                    .material-section { margin: 20px 0; page-break-inside: avoid; }
-                    .material-section h2 { color: var(--accent); margin: 0 0 15px 0; padding: 8px 0; border-bottom: 2px solid var(--accent); font-size: 18px; }
+                    /* Material sections */
+                    .material-section { margin: 30px 0; page-break-before: always; }
+                    .material-section:first-child { page-break-before: auto; }
+                    .material-section h2 { color: var(--accent); margin: 0 0 20px 0; padding: 10px 0; border-bottom: 2px solid var(--accent); font-size: 20px; }
+                    .total-count { font-size: 14px; font-weight: normal; color: var(--primary); }
                     
-                    /* Compact pattern cards */
-                    .compact-pattern { margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; page-break-inside: avoid; }
-                    .pattern-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-                    .pattern-header h3 { margin: 0; font-size: 14px; color: var(--primary); }
-                    .piece-count { background: var(--accent); color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
-                    
-                    /* Compact piece list */
-                    .piece-list { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
-                    .piece { background: var(--primary); color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 500; }
-                    .waste { background: var(--error); color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 500; }
+                    /* Individual plank cards */
+                    .plank-card { margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; page-break-inside: avoid; }
+                    .plank-card h3 { margin: 0 0 10px 0; font-size: 14px; color: var(--primary); }
                     
                     /* Plank visualization styles */
                     .planka { border-radius: 4px; margin-bottom: 15px; position: relative; background-color: #f5f5f5; border: 1px solid #ddd; overflow: hidden; }
@@ -949,7 +944,7 @@ export class TimberCalculator {
     }
 
     /**
-     * Generate compact cutting guide HTML for printing
+     * Generate cutting guide with individual plank visualizations (no instructions)
      */
     generateCuttingGuide() {
         const results = this.lastCalculationResults;
@@ -957,59 +952,19 @@ export class TimberCalculator {
         
         Object.entries(results.dimensionResults).forEach(([dimension, result]) => {
             if (!result.error && result.plankor) {
-                // Compact header with essential info
+                // Material header with total plank count
                 html += `<div class="material-section">`;
-                html += `<h2>${dimension} - ${result.lagerLangd} mm</h2>`;
+                html += `<h2>${dimension} - ${result.lagerLangd} mm <span class="total-count">(${result.plankor.length} plankor totalt)</span></h2>`;
                 
-                // Group identical cutting patterns
-                const uniquePatterns = new Map();
-                
+                // Show each individual plank
                 result.plankor.forEach((planka, index) => {
-                    // Create a signature for this cutting pattern
-                    const signature = planka.map(bit => {
-                        const artikel = this.artiklar.find(a => a.id === bit.artikelId);
-                        return `${bit.langd}-${artikel ? artikel.namn : 'unknown'}`;
-                    }).join('|');
+                    html += `<div class="plank-card">`;
+                    html += `<h3>Planka ${index + 1}</h3>`;
                     
-                    if (uniquePatterns.has(signature)) {
-                        uniquePatterns.get(signature).count++;
-                    } else {
-                        uniquePatterns.set(signature, {
-                            planka: planka,
-                            count: 1,
-                            waste: result.lagerLangd - planka.reduce((sum, bit) => sum + bit.langd, 0)
-                        });
-                    }
-                });
-                
-                // Compact pattern cards
-                let patternIndex = 1;
-                uniquePatterns.forEach((pattern, signature) => {
-                    html += `<div class="compact-pattern">`;
-                    
-                    // Pattern header with count
-                    html += `<div class="pattern-header">`;
-                    html += `<h3>Mönster ${patternIndex}</h3>`;
-                    html += `<div class="piece-count">${pattern.count} st</div>`;
-                    html += `</div>`;
-                    
-                    // Compact visualization
-                    html += UIComponents.renderPlankaVisualization(pattern.planka, result.lagerLangd, patternIndex - 1, this.artiklar);
-                    
-                    // Simple piece list
-                    html += `<div class="piece-list">`;
-                    pattern.planka.forEach((bit, bitIndex) => {
-                        const artikel = this.artiklar.find(a => a.id === bit.artikelId);
-                        const originalLength = artikel ? artikel.originalLangd || bit.langd : bit.langd;
-                        html += `<span class="piece">${originalLength}mm</span>`;
-                    });
-                    if (pattern.waste > 0) {
-                        html += `<span class="waste">Spill: ${pattern.waste}mm</span>`;
-                    }
-                    html += `</div>`;
+                    // Use the visualization from web interface
+                    html += UIComponents.renderPlankaVisualization(planka, result.lagerLangd, index, this.artiklar);
                     
                     html += `</div>`;
-                    patternIndex++;
                 });
                 
                 html += `</div>`;
