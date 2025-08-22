@@ -56,10 +56,21 @@ function initializeDropdowns() {
         optimizationSelect.innerHTML = UIComponents.renderOptimizationStrategiesDropdown(CONFIG.OPTIMIZATION_STRATEGIES);
     }
     
-    // Initialize standard length buttons
+    // Initialize standard length buttons - only show after dimension selection
     const standardLengthsContainer = document.getElementById('standard-lengths-container');
     if (standardLengthsContainer) {
-        standardLengthsContainer.innerHTML = UIComponents.renderStandardLengthButtons(CONFIG.STANDARD_LENGTHS);
+        standardLengthsContainer.innerHTML = '<!-- Available lengths will be shown when dimension is selected -->';
+    }
+    
+    // Initialize standard length buttons for Lager tab
+    const lagerStandardLengthsContainer = document.getElementById('lager-standard-lengths-container');
+    if (lagerStandardLengthsContainer) {
+        lagerStandardLengthsContainer.innerHTML = `
+            <h4>Vanliga standardlängder</h4>
+            <div class="standard-lengths">
+                ${UIComponents.renderStandardLengthButtons(CONFIG.STANDARD_LENGTHS)}
+            </div>
+        `;
     }
 }
 

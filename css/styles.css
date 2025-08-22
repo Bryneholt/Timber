@@ -942,13 +942,15 @@ tr:hover td {
     transform: translateY(1px);
 }
 
-#standard-lengths-container h4 {
+#standard-lengths-container h4,
+#lager-standard-lengths-container h4 {
     margin: 1rem 0 0.5rem 0;
     color: #495057;
     font-size: 1rem;
 }
 
-#standard-lengths-container .standard-lengths {
+#standard-lengths-container .standard-lengths,
+#lager-standard-lengths-container .standard-lengths {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
