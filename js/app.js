@@ -843,11 +843,20 @@ export class TimberCalculator {
                     h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
                     h2 { color: var(--accent); margin-top: 30px; }
                     
-                    /* Kapning container styles */
-                    .kapning-container { margin: 30px 0; }
-                    .summary-box { padding: 15px; border-radius: 8px; background-color: var(--light-grey); margin-bottom: 15px; border-left: 4px solid var(--primary); }
-                    .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; background-color: var(--primary-light); color: white; }
-                    .pattern-group { margin: 25px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
+                    /* Compact material sections */
+                    .material-section { margin: 20px 0; page-break-inside: avoid; }
+                    .material-section h2 { color: var(--accent); margin: 0 0 15px 0; padding: 8px 0; border-bottom: 2px solid var(--accent); font-size: 18px; }
+                    
+                    /* Compact pattern cards */
+                    .compact-pattern { margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; page-break-inside: avoid; }
+                    .pattern-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+                    .pattern-header h3 { margin: 0; font-size: 14px; color: var(--primary); }
+                    .piece-count { background: var(--accent); color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+                    
+                    /* Compact piece list */
+                    .piece-list { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+                    .piece { background: var(--primary); color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 500; }
+                    .waste { background: var(--error); color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 500; }
                     
                     /* Plank visualization styles */
                     .planka { border-radius: 4px; margin-bottom: 15px; position: relative; background-color: #f5f5f5; border: 1px solid #ddd; overflow: hidden; }
@@ -863,11 +872,6 @@ export class TimberCalculator {
                     .cut-line { width: 2px; height: 100%; background-color: #dc2626; position: relative; flex-shrink: 0; box-shadow: 0 0 3px rgba(220, 38, 38, 0.5); }
                     .cut-line::before { content: '✂'; position: absolute; top: -8px; left: -6px; font-size: 12px; color: #dc2626; }
                     
-                    /* Instruction styles */
-                    .cut-instructions { margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e5e5e5; }
-                    .cut-instruction { padding: 8px 0; border-bottom: 1px dotted #ccc; }
-                    .cut-instruction:last-child { border-bottom: none; }
-                    .waste-note { margin-top: 10px; padding: 8px; background: #fff2f2; border: 1px solid #fecaca; border-radius: 4px; color: #991b1b; font-weight: 500; }
                     
                     .footer { margin-top: 30px; font-size: 12px; color: #666; border-top: 1px solid #ddd; padding-top: 10px; }
                     @media print { .no-print { display: none; } }
@@ -945,7 +949,7 @@ export class TimberCalculator {
     }
 
     /**
-     * Generate cutting guide HTML with unique cutting patterns and counts
+     * Generate compact cutting guide HTML for printing
      */
     generateCuttingGuide() {
         const results = this.lastCalculationResults;
@@ -953,13 +957,9 @@ export class TimberCalculator {
         
         Object.entries(results.dimensionResults).forEach(([dimension, result]) => {
             if (!result.error && result.plankor) {
-                // Use the same structure as UIComponents.renderDimensionResults
-                html += `<div class="kapning-container">`;
-                html += `<h2>Dimension: ${dimension} <span class="badge">${result.plankor.length} plankor</span></h2>`;
-                html += `<div class="summary-box">`;
-                html += `<p><strong>Lagerlängd:</strong> ${result.lagerLangd} mm | <strong>Pris:</strong> ${result.lagerPris.toFixed(2)} kr/m</p>`;
-                html += `<p><strong>Totalt spill:</strong> ${result.totalSpill} mm | <strong>Total kostnad:</strong> ${result.totalKostnad.toFixed(2)} kr</p>`;
-                html += `</div>`;
+                // Compact header with essential info
+                html += `<div class="material-section">`;
+                html += `<h2>${dimension} - ${result.lagerLangd} mm</h2>`;
                 
                 // Group identical cutting patterns
                 const uniquePatterns = new Map();
@@ -982,41 +982,32 @@ export class TimberCalculator {
                     }
                 });
                 
-                // Render each unique pattern with count
+                // Compact pattern cards
                 let patternIndex = 1;
                 uniquePatterns.forEach((pattern, signature) => {
-                    html += `<div class="pattern-group">`;
-                    html += `<h4>Kapmönster ${patternIndex} <span class="badge">${pattern.count} st plankor</span></h4>`;
+                    html += `<div class="compact-pattern">`;
                     
-                    // Use the exact same visualization as the web interface
+                    // Pattern header with count
+                    html += `<div class="pattern-header">`;
+                    html += `<h3>Mönster ${patternIndex}</h3>`;
+                    html += `<div class="piece-count">${pattern.count} st</div>`;
+                    html += `</div>`;
+                    
+                    // Compact visualization
                     html += UIComponents.renderPlankaVisualization(pattern.planka, result.lagerLangd, patternIndex - 1, this.artiklar);
                     
-                    // Add cutting instructions below the visualization
-                    html += `<div class="cut-instructions">`;
-                    html += `<h5>Kapinstruktioner (upprepa ${pattern.count} gånger):</h5>`;
-                    
-                    let position = 0;
+                    // Simple piece list
+                    html += `<div class="piece-list">`;
                     pattern.planka.forEach((bit, bitIndex) => {
                         const artikel = this.artiklar.find(a => a.id === bit.artikelId);
-                        const spillAmount = artikel ? artikel.spillMargin || 0 : 0;
                         const originalLength = artikel ? artikel.originalLangd || bit.langd : bit.langd;
-                        
-                        html += `<div class="cut-instruction">`;
-                        html += `${bitIndex + 1}. Mät från ${position} mm, kapa ${originalLength} mm`;
-                        if (spillAmount > 0) {
-                            html += ` (inkl. ${spillAmount} mm spill)`;
-                        }
-                        html += `<br><em>Artikel: ${artikel ? artikel.namn : 'Okänd artikel'}</em>`;
-                        html += `</div>`;
-                        
-                        position += bit.langd;
+                        html += `<span class="piece">${originalLength}mm</span>`;
                     });
-                    
                     if (pattern.waste > 0) {
-                        html += `<div class="waste-note"><strong>Kvarvarande spill:</strong> ${pattern.waste} mm</div>`;
+                        html += `<span class="waste">Spill: ${pattern.waste}mm</span>`;
                     }
-                    
                     html += `</div>`;
+                    
                     html += `</div>`;
                     patternIndex++;
                 });
