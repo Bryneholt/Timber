@@ -5,7 +5,7 @@ export const COMPANIES = {
         id: 'hornbach',
         name: 'Hornbach',
         baseUrl: 'https://www.hornbach.se',
-        logo: 'HB'
+        logo: 'HB',
         categories: {
             virke: {
                 name: 'Virke',
@@ -53,7 +53,7 @@ export const COMPANIES = {
         id: 'bauhaus',
         name: 'Bauhaus',
         baseUrl: 'https://www.bauhaus.se',
-        logo: 'BH'
+        logo: 'BH',
         categories: {
             virke: {
                 name: 'Virke',
@@ -81,7 +81,7 @@ export const COMPANIES = {
         id: 'byggmax',
         name: 'Byggmax',
         baseUrl: 'https://www.byggmax.se',
-        logo: 'BM'
+        logo: 'BM',
         categories: {
             virke: {
                 name: 'Virke',
