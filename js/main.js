@@ -41,10 +41,8 @@ function initializeDropdowns() {
         try {
             const hornbachMaterials = getCompanyMaterials('hornbach');
             console.log('✅ Loaded Hornbach materials:', hornbachMaterials.length);
-            const dimensions = [...new Set(hornbachMaterials.map(m => m.dimension))].sort();
-            console.log('📏 Available dimensions:', dimensions);
-            dimensionSelect.innerHTML = UIComponents.renderDimensionsFromMaterials(dimensions);
-            console.log('🎯 Dropdown populated successfully');
+            dimensionSelect.innerHTML = UIComponents.renderDimensionsFromMaterials(hornbachMaterials);
+            console.log('🎯 Dropdown populated with categories');
         } catch (error) {
             console.error('❌ Error initializing dropdown:', error);
             // Fallback to CONFIG if scraped materials fail

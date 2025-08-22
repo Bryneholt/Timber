@@ -263,18 +263,96 @@ export class UIComponents {
     }
 
     /**
-     * Render dimensions dropdown from scraped materials
-     * @param {Array} dimensions - Array of dimensions from scraped materials
+     * Render dimensions dropdown from scraped materials with categories
+     * @param {Array} materials - Array of material objects with dimensions and names
      * @returns {string} - HTML string for the dropdown
      */
-    static renderDimensionsFromMaterials(dimensions) {
+    static renderDimensionsFromMaterials(materials) {
+        const categorizedDimensions = this.categorizeDimensions(materials);
+        
         let html = '<option value="">Anpassad dimension...</option>';
         
-        dimensions.forEach(dim => {
-            html += `<option value="${dim}">${dim} mm</option>`;
+        // Add each category as an optgroup
+        Object.entries(categorizedDimensions).forEach(([category, dimensions]) => {
+            if (dimensions.length > 0) {
+                html += `<optgroup label="${category}">`;
+                dimensions.sort().forEach(dim => {
+                    html += `<option value="${dim}">${dim} mm</option>`;
+                });
+                html += '</optgroup>';
+            }
         });
         
         return html;
+    }
+
+    /**
+     * Categorize dimensions based on material names
+     * @param {Array} materials - Array of material objects
+     * @returns {Object} - Object with categories as keys and dimension arrays as values
+     */
+    static categorizeDimensions(materials) {
+        const categories = {
+            'Reglar': new Set(),
+            'Trall': new Set(),
+            'Panel': new Set(),
+            'Råspont': new Set(),
+            'Stolpar': new Set(),
+            'Läkt': new Set(),
+            'Foder/Sockel': new Set(),
+            'Staket': new Set(),
+            'Övrigt': new Set()
+        };
+        
+        materials.forEach(material => {
+            const name = material.name.toLowerCase();
+            const dimension = material.dimension;
+            let categoryFound = false;
+            
+            if (name.includes('regel')) {
+                categories['Reglar'].add(dimension);
+                categoryFound = true;
+            }
+            if (name.includes('trall')) {
+                categories['Trall'].add(dimension);
+                categoryFound = true;
+            }
+            if (name.includes('panel') || name.includes('ytterpanel')) {
+                categories['Panel'].add(dimension);
+                categoryFound = true;
+            }
+            if (name.includes('råspont') || name.includes('spont')) {
+                categories['Råspont'].add(dimension);
+                categoryFound = true;
+            }
+            if (name.includes('stolpe')) {
+                categories['Stolpar'].add(dimension);
+                categoryFound = true;
+            }
+            if (name.includes('läkt') || name.includes('lakt')) {
+                categories['Läkt'].add(dimension);
+                categoryFound = true;
+            }
+            if (name.includes('sockel') || name.includes('foder')) {
+                categories['Foder/Sockel'].add(dimension);
+                categoryFound = true;
+            }
+            if (name.includes('staket') || name.includes('glespanel')) {
+                categories['Staket'].add(dimension);
+                categoryFound = true;
+            }
+            
+            if (!categoryFound) {
+                categories['Övrigt'].add(dimension);
+            }
+        });
+        
+        // Convert Sets to Arrays
+        Object.keys(categories).forEach(key => {
+            categories[key] = Array.from(categories[key]);
+        });
+        
+        return categories;
     }
 
     /**
