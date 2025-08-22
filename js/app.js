@@ -847,6 +847,7 @@ export class TimberCalculator {
                     .kapning-container { margin: 30px 0; }
                     .summary-box { padding: 15px; border-radius: 8px; background-color: var(--light-grey); margin-bottom: 15px; border-left: 4px solid var(--primary); }
                     .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; background-color: var(--primary-light); color: white; }
+                    .pattern-group { margin: 25px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
                     
                     /* Plank visualization styles */
                     .planka { border-radius: 4px; margin-bottom: 15px; position: relative; background-color: #f5f5f5; border: 1px solid #ddd; overflow: hidden; }
@@ -943,7 +944,7 @@ export class TimberCalculator {
     }
 
     /**
-     * Generate cutting guide HTML with visual diagrams (same as web interface)
+     * Generate cutting guide HTML with unique cutting patterns and counts
      */
     generateCuttingGuide() {
         const results = this.lastCalculationResults;
@@ -959,16 +960,42 @@ export class TimberCalculator {
                 html += `<p><strong>Totalt spill:</strong> ${result.totalSpill} mm | <strong>Total kostnad:</strong> ${result.totalKostnad.toFixed(2)} kr</p>`;
                 html += `</div>`;
                 
-                // Use the exact same visualization as the web interface
+                // Group identical cutting patterns
+                const uniquePatterns = new Map();
+                
                 result.plankor.forEach((planka, index) => {
-                    html += UIComponents.renderPlankaVisualization(planka, result.lagerLangd, index, this.artiklar);
+                    // Create a signature for this cutting pattern
+                    const signature = planka.map(bit => {
+                        const artikel = this.artiklar.find(a => a.id === bit.artikelId);
+                        return `${bit.langd}-${artikel ? artikel.namn : 'unknown'}`;
+                    }).join('|');
                     
-                    // Add cutting instructions below each plank
+                    if (uniquePatterns.has(signature)) {
+                        uniquePatterns.get(signature).count++;
+                    } else {
+                        uniquePatterns.set(signature, {
+                            planka: planka,
+                            count: 1,
+                            waste: result.lagerLangd - planka.reduce((sum, bit) => sum + bit.langd, 0)
+                        });
+                    }
+                });
+                
+                // Render each unique pattern with count
+                let patternIndex = 1;
+                uniquePatterns.forEach((pattern, signature) => {
+                    html += `<div class="pattern-group">`;
+                    html += `<h4>Kapmönster ${patternIndex} <span class="badge">${pattern.count} st plankor</span></h4>`;
+                    
+                    // Use the exact same visualization as the web interface
+                    html += UIComponents.renderPlankaVisualization(pattern.planka, result.lagerLangd, patternIndex - 1, this.artiklar);
+                    
+                    // Add cutting instructions below the visualization
                     html += `<div class="cut-instructions">`;
-                    html += `<h5>Kapinstruktioner för Planka ${index + 1}:</h5>`;
+                    html += `<h5>Kapinstruktioner (upprepa ${pattern.count} gånger):</h5>`;
                     
                     let position = 0;
-                    planka.forEach((bit, bitIndex) => {
+                    pattern.planka.forEach((bit, bitIndex) => {
                         const artikel = this.artiklar.find(a => a.id === bit.artikelId);
                         const spillAmount = artikel ? artikel.spillMargin || 0 : 0;
                         const originalLength = artikel ? artikel.originalLangd || bit.langd : bit.langd;
@@ -984,12 +1011,13 @@ export class TimberCalculator {
                         position += bit.langd;
                     });
                     
-                    const waste = result.lagerLangd - position;
-                    if (waste > 0) {
-                        html += `<div class="waste-note"><strong>Kvarvarande spill:</strong> ${waste} mm</div>`;
+                    if (pattern.waste > 0) {
+                        html += `<div class="waste-note"><strong>Kvarvarande spill:</strong> ${pattern.waste} mm</div>`;
                     }
                     
                     html += `</div>`;
+                    html += `</div>`;
+                    patternIndex++;
                 });
                 
                 html += `</div>`;
