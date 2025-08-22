@@ -134,8 +134,9 @@ export class TimberCalculator {
         const namn = document.getElementById('artikel-namn').value.trim();
         const antal = parseInt(document.getElementById('behov-antal').value);
         const langd = parseInt(document.getElementById('behov-langd').value);
+        const spillMargin = parseInt(document.getElementById('spill-margin').value) || 0;
         
-        const artikel = { namn, antal, langd };
+        const artikel = { namn, antal, langd, spillMargin };
         const validation = validateArtikel(artikel);
         
         if (!validation.isValid) {
@@ -144,13 +145,16 @@ export class TimberCalculator {
         }
         
         const dimension = getDimensionFromArtikelnamn(namn);
+        const adjustedLangd = langd + spillMargin; // Add spill to required length
         
         const newArtikel = {
             id: generateId(this.lastId),
             namn: namn,
             dimension: dimension,
             antal: antal,
-            langd: langd
+            langd: adjustedLangd,
+            originalLangd: langd,
+            spillMargin: spillMargin
         };
         
         this.artiklar.push(newArtikel);
@@ -192,6 +196,7 @@ export class TimberCalculator {
         document.getElementById('artikel-namn').value = '';
         document.getElementById('behov-antal').value = '';
         document.getElementById('behov-langd').value = '';
+        document.getElementById('spill-margin').value = '5'; // Reset to default
         document.getElementById('dimension-select').selectedIndex = 0;
     }
 
@@ -254,7 +259,8 @@ export class TimberCalculator {
         document.getElementById('edit-id').value = artikel.id;
         document.getElementById('edit-namn').value = artikel.namn;
         document.getElementById('edit-antal').value = artikel.antal;
-        document.getElementById('edit-langd').value = artikel.langd;
+        document.getElementById('edit-langd').value = artikel.originalLangd || artikel.langd;
+        document.getElementById('edit-spill').value = artikel.spillMargin || 0;
         
         this.openModal('edit-modal');
     }
@@ -267,8 +273,9 @@ export class TimberCalculator {
         const namn = document.getElementById('edit-namn').value.trim();
         const antal = parseInt(document.getElementById('edit-antal').value);
         const langd = parseInt(document.getElementById('edit-langd').value);
+        const spillMargin = parseInt(document.getElementById('edit-spill').value) || 0;
         
-        const artikel = { namn, antal, langd };
+        const artikel = { namn, antal, langd, spillMargin };
         const validation = validateArtikel(artikel);
         
         if (!validation.isValid) {
@@ -279,13 +286,16 @@ export class TimberCalculator {
         const index = this.artiklar.findIndex(a => a.id === id);
         if (index !== -1) {
             const dimension = getDimensionFromArtikelnamn(namn);
+            const adjustedLangd = langd + spillMargin;
             
             this.artiklar[index] = {
                 id: id,
                 namn: namn,
                 dimension: dimension,
                 antal: antal,
-                langd: langd
+                langd: adjustedLangd,
+                originalLangd: langd,
+                spillMargin: spillMargin
             };
             
             if (!this.lagerLangder[dimension]) {

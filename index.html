@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="version-indicator">v1.3.0</div>
+    <div class="version-indicator">v1.4.0</div>
     <h1>Smart Virke- och Kapningsberäknare</h1>
     
     <div class="container">
@@ -33,28 +33,32 @@
             </div>
             
             <form id="artikel-form">
-                <div class="flex">
-                    <div class="form-group">
-                        <label for="dimension-select">Standarddimension:</label>
-                        <select id="dimension-select">
-                            <!-- Populated by JavaScript -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="artikel-namn">Artikelnamn/Dimension:</label>
-                        <input type="text" id="artikel-namn" placeholder="t.ex. 45x95, Takregel, etc.">
-                    </div>
+                <div class="form-group">
+                    <label for="dimension-select">Standarddimension:</label>
+                    <select id="dimension-select">
+                        <!-- Populated by JavaScript -->
+                    </select>
                 </div>
                 
-                <div class="flex">
-                    <div class="form-group">
-                        <label for="behov-antal">Antal stycken:</label>
-                        <input type="number" min="1" id="behov-antal" placeholder="Antal bitar">
-                    </div>
-                    <div class="form-group">
-                        <label for="behov-langd">Längd per styck (mm):</label>
-                        <input type="number" min="1" id="behov-langd" placeholder="t.ex. 2400">
-                    </div>
+                <div class="form-group">
+                    <label for="artikel-namn">Artikelnamn/Dimension:</label>
+                    <input type="text" id="artikel-namn" placeholder="t.ex. 45x95, Takregel, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="behov-antal">Antal stycken:</label>
+                    <input type="number" min="1" id="behov-antal" placeholder="Antal bitar">
+                </div>
+                
+                <div class="form-group">
+                    <label for="behov-langd">Längd per styck (mm):</label>
+                    <input type="number" min="1" id="behov-langd" placeholder="t.ex. 2400">
+                </div>
+                
+                <div class="form-group">
+                    <label for="spill-margin">Spill/Avfall (mm):</label>
+                    <input type="number" min="0" id="spill-margin" value="5" placeholder="Kapspill per bit">
+                    <small class="form-help">Extra längd som läggs till varje bit för kapspill</small>
                 </div>
                 
                 <div class="actions">
@@ -80,6 +84,7 @@
                             <th>Namn</th>
                             <th>Antal</th>
                             <th>Längd (mm)</th>
+                            <th>Spill (mm)</th>
                             <th>Total längd (m)</th>
                             <th>Åtgärder</th>
                         </tr>
@@ -223,15 +228,17 @@
                     <label for="edit-namn">Artikelnamn/Dimension:</label>
                     <input type="text" id="edit-namn">
                 </div>
-                <div class="flex">
-                    <div class="form-group">
-                        <label for="edit-antal">Antal stycken:</label>
-                        <input type="number" min="1" id="edit-antal">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-langd">Längd per styck (mm):</label>
-                        <input type="number" min="1" id="edit-langd">
-                    </div>
+                <div class="form-group">
+                    <label for="edit-antal">Antal stycken:</label>
+                    <input type="number" min="1" id="edit-antal">
+                </div>
+                <div class="form-group">
+                    <label for="edit-langd">Längd per styck (mm):</label>
+                    <input type="number" min="1" id="edit-langd">
+                </div>
+                <div class="form-group">
+                    <label for="edit-spill">Spill/Avfall (mm):</label>
+                    <input type="number" min="0" id="edit-spill">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="secondary modal-close-btn">Avbryt</button>

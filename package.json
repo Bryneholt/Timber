@@ -1,6 +1,6 @@
 {
   "name": "smart-virke-kapningsberaknare",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A comprehensive Swedish timber and cutting optimization calculator",
   "main": "index.html",
   "type": "module",

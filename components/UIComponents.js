@@ -141,12 +141,15 @@ export class UIComponents {
      */
     static renderArticleRow(artikel) {
         const totalLangd = (artikel.antal * artikel.langd) / 1000; // in meters
+        const originalLangd = artikel.originalLangd || artikel.langd;
+        const spillMargin = artikel.spillMargin || 0;
         
         return `
             <tr>
                 <td>${artikel.namn}</td>
                 <td>${artikel.antal} st</td>
-                <td>${artikel.langd} mm</td>
+                <td>${originalLangd} mm</td>
+                <td>${spillMargin} mm</td>
                 <td>${totalLangd.toFixed(2).replace('.', ',')} m</td>
                 <td class="actions">
                     <button class="icon small" onclick="app.editArtikel(${artikel.id})">

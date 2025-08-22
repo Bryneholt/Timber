@@ -97,6 +97,14 @@ h1 {
     margin-bottom: 8px;
 }
 
+.form-help {
+    display: block;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    font-style: italic;
+}
+
 label {
     display: block;
     margin-bottom: 5px;
