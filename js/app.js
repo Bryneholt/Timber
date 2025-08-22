@@ -852,8 +852,9 @@ export class TimberCalculator {
                     /* Plank visualization styles */
                     .planka { border-radius: 4px; margin-bottom: 15px; position: relative; background-color: #f5f5f5; border: 1px solid #ddd; overflow: hidden; }
                     .planka-info { background: var(--secondary); color: white; padding: 4px 8px; font-size: 12px; position: absolute; top: 0; right: 0; border-bottom-left-radius: 4px; }
-                    .planka-segments { display: flex; height: 40px; }
-                    .segment { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 5px; }
+                    .planka-segments { display: flex; height: 50px; align-items: stretch; }
+                    .segment { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 3px; min-width: 30px; position: relative; border-right: 1px solid rgba(255, 255, 255, 0.2); }
+                    .segment:last-child { border-right: none; }
                     .segment.virke { background-color: var(--primary); }
                     .segment.spill { background-color: var(--error); }
                     .segment.waste { background-color: #f44336; }

@@ -36,9 +36,19 @@ export class UIComponents {
         // Visualize pieces in the plank with cut lines
         segments.forEach((segment, segmentIndex) => {
             const bredde = (segment.langd / plankaLangd) * 100;
+            
+            // Only show text if segment is wide enough (>8% width) or for very important segments
+            let displayText = '';
+            if (bredde > 8) {
+                displayText = segment.langd;
+            } else if (bredde > 5) {
+                displayText = segment.langd.toString().slice(0, 3); // Truncate for narrow segments
+            }
+            // For very narrow segments (<5%), show no text (tooltip still shows info)
+            
             html += `
                 <div class="segment virke" style="width: ${bredde}%;" title="${segment.namn}: ${segment.langd} mm">
-                    ${segment.langd}
+                    ${displayText}
                 </div>
             `;
             
@@ -52,11 +62,19 @@ export class UIComponents {
         if (spillLangd > 0) {
             html += `<div class="cut-line" title="Kapa av spill här"></div>`;
             
-            // Visualize waste
+            // Visualize waste with conditional text
             const spillBredde = (spillLangd / plankaLangd) * 100;
+            let spillDisplayText = '';
+            if (spillBredde > 8) {
+                spillDisplayText = spillLangd;
+            } else if (spillBredde > 5) {
+                spillDisplayText = spillLangd.toString().slice(0, 3);
+            }
+            // For very narrow spill (<5%), show no text
+            
             html += `
                 <div class="segment spill" style="width: ${spillBredde}%;" title="Spill: ${spillLangd} mm">
-                    ${spillLangd}
+                    ${spillDisplayText}
                 </div>
             `;
         }
