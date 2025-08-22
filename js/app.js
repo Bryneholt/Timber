@@ -16,6 +16,7 @@ export class TimberCalculator {
         this.lagerLangder = {};
         this.lastId = 0;
         this.currentDimension = '';
+        this.lastCalculationResults = null;
         
         this.init();
     }
@@ -112,6 +113,15 @@ export class TimberCalculator {
         // Import project
         document.getElementById('import-projekt-btn').addEventListener('click', () => {
             this.importProjekt();
+        });
+        
+        // Print buttons
+        document.getElementById('print-shopping-btn').addEventListener('click', () => {
+            this.printShoppingList();
+        });
+        
+        document.getElementById('print-cutting-btn').addEventListener('click', () => {
+            this.printCuttingGuide();
         });
     }
 
@@ -529,6 +539,10 @@ export class TimberCalculator {
             
             results.innerHTML = html || UIComponents.renderNoResults();
             
+            // Store results for printing and show print buttons
+            this.lastCalculationResults = stats;
+            document.getElementById('print-actions').style.display = 'flex';
+            
             // Switch to results tab
             this.switchTab('resultat');
         }, 100);
@@ -736,5 +750,176 @@ export class TimberCalculator {
         } catch (error) {
             console.error('Error saving to storage:', error);
         }
+    }
+
+    /**
+     * Print shopping list
+     */
+    printShoppingList() {
+        if (!this.lastCalculationResults) {
+            showAlert('Beräkna optimal kapning först', 'error');
+            return;
+        }
+
+        const shoppingList = this.generateShoppingList();
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Inköpslista - Virke</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                    th { background-color: #f5f5f5; font-weight: bold; }
+                    .summary { background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                    .footer { margin-top: 30px; font-size: 12px; color: #666; }
+                    @media print { .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                ${shoppingList}
+                <div class="footer">
+                    <p>Genererad av Smart Virke- och Kapningsberäknare - ${new Date().toLocaleDateString('sv-SE')}</p>
+                </div>
+                <script>window.print();</script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    /**
+     * Print cutting guide
+     */
+    printCuttingGuide() {
+        if (!this.lastCalculationResults) {
+            showAlert('Beräkna optimal kapning först', 'error');
+            return;
+        }
+
+        const cuttingGuide = this.generateCuttingGuide();
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Kapguide - Virke</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                    .plank { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+                    .cuts { margin: 10px 0; }
+                    .cut-item { padding: 5px 0; border-bottom: 1px dotted #ccc; }
+                    .summary { background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                    .footer { margin-top: 30px; font-size: 12px; color: #666; }
+                    @media print { .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                ${cuttingGuide}
+                <div class="footer">
+                    <p>Genererad av Smart Virke- och Kapningsberäknare - ${new Date().toLocaleDateString('sv-SE')}</p>
+                </div>
+                <script>window.print();</script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    /**
+     * Generate shopping list HTML
+     */
+    generateShoppingList() {
+        const results = this.lastCalculationResults;
+        let html = '<h1>📋 Inköpslista</h1>';
+        
+        // Summary
+        html += '<div class="summary">';
+        html += '<h3>Sammanfattning</h3>';
+        html += `<p><strong>Total kostnad:</strong> ${results.totalCost.toFixed(2).replace('.', ',')} kr</p>`;
+        html += `<p><strong>Totalt spill:</strong> ${(results.totalWaste / 1000).toFixed(2).replace('.', ',')} m</p>`;
+        html += `<p><strong>Utnyttjande:</strong> ${results.efficiency.toFixed(1)}%</p>`;
+        html += '</div>';
+
+        // Shopping list by dimension
+        html += '<h3>Att köpa:</h3>';
+        html += '<table>';
+        html += '<thead><tr><th>Dimension</th><th>Längd</th><th>Antal plankor</th><th>Pris/m</th><th>Total kostnad</th></tr></thead>';
+        html += '<tbody>';
+        
+        Object.entries(results.dimensionResults).forEach(([dimension, result]) => {
+            if (!result.error && result.plankor) {
+                // Group by length
+                const byLength = {};
+                result.plankor.forEach(planka => {
+                    const langd = result.lagerLangd;
+                    if (!byLength[langd]) {
+                        byLength[langd] = { count: 0, price: planka.prisPerMeter || 25 };
+                    }
+                    byLength[langd].count++;
+                });
+                
+                Object.entries(byLength).forEach(([langd, info]) => {
+                    const totalCost = (info.count * (langd / 1000) * info.price);
+                    html += `<tr>`;
+                    html += `<td>${dimension} mm</td>`;
+                    html += `<td>${langd} mm</td>`;
+                    html += `<td>${info.count} st</td>`;
+                    html += `<td>${info.price.toFixed(2).replace('.', ',')} kr/m</td>`;
+                    html += `<td>${totalCost.toFixed(2).replace('.', ',')} kr</td>`;
+                    html += `</tr>`;
+                });
+            }
+        });
+        
+        html += '</tbody></table>';
+        return html;
+    }
+
+    /**
+     * Generate cutting guide HTML
+     */
+    generateCuttingGuide() {
+        const results = this.lastCalculationResults;
+        let html = '<h1>✂️ Kapguide</h1>';
+        
+        Object.entries(results.dimensionResults).forEach(([dimension, result]) => {
+            if (!result.error && result.plankor) {
+                html += `<h2>${dimension} mm</h2>`;
+                
+                result.plankor.forEach((planka, index) => {
+                    html += `<div class="plank">`;
+                    html += `<h4>Planka ${index + 1} (${result.lagerLangd} mm)</h4>`;
+                    html += `<div class="cuts">`;
+                    
+                    let currentPosition = 0;
+                    planka.forEach((bit, bitIndex) => {
+                        const artikel = this.artiklar.find(a => a.id === bit.artikelId);
+                        const actualLength = artikel ? artikel.originalLangd || bit.langd : bit.langd;
+                        const spillAmount = artikel ? artikel.spillMargin || 0 : 0;
+                        
+                        html += `<div class="cut-item">`;
+                        html += `${bitIndex + 1}. Kapa ${actualLength} mm (+ ${spillAmount} mm spill) från position ${currentPosition} mm`;
+                        html += `<br><em>${artikel ? artikel.namn : 'Okänd artikel'}</em>`;
+                        html += `</div>`;
+                        
+                        currentPosition += bit.langd;
+                    });
+                    
+                    const waste = result.lagerLangd - currentPosition;
+                    if (waste > 0) {
+                        html += `<div class="cut-item"><strong>Kvar: ${waste} mm (spill)</strong></div>`;
+                    }
+                    
+                    html += `</div></div>`;
+                });
+            }
+        });
+        
+        return html;
     }
 }

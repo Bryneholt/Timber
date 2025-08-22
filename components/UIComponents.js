@@ -33,14 +33,19 @@ export class UIComponents {
                 <div class="planka-segments">
         `;
         
-        // Visualize pieces in the plank
-        segments.forEach(segment => {
+        // Visualize pieces in the plank with cut lines
+        segments.forEach((segment, segmentIndex) => {
             const bredde = (segment.langd / plankaLangd) * 100;
             html += `
                 <div class="segment virke" style="width: ${bredde}%;" title="${segment.namn}: ${segment.langd} mm">
                     ${segment.langd}
                 </div>
             `;
+            
+            // Add red cut line between segments (except after the last segment)
+            if (segmentIndex < segments.length - 1) {
+                html += `<div class="cut-line" title="Kap här"></div>`;
+            }
         });
         
         // Visualize waste
