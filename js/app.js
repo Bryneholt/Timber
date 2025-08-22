@@ -864,8 +864,25 @@ export class TimberCalculator {
                     .segment.waste { background-color: #f59e0b; }
                     
                     /* Cut line styles */
-                    .cut-line { width: 2px; height: 100%; background-color: #dc2626; position: relative; flex-shrink: 0; box-shadow: 0 0 3px rgba(220, 38, 38, 0.5); }
-                    .cut-line::before { content: '✂'; position: absolute; top: -8px; left: -6px; font-size: 12px; color: #dc2626; }
+                    .cut-line { 
+                        width: 3px; 
+                        height: 100%; 
+                        background: repeating-linear-gradient(to bottom, white 0px, white 3px, transparent 3px, transparent 6px); 
+                        border-left: 1px solid #000; 
+                        border-right: 1px solid #000; 
+                        position: relative; 
+                        flex-shrink: 0; 
+                        box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); 
+                    }
+                    .cut-line::before { 
+                        content: '✂'; 
+                        position: absolute; 
+                        top: -8px; 
+                        left: -7px; 
+                        font-size: 12px; 
+                        color: #000; 
+                        text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; 
+                    }
                     
                     
                     .footer { margin-top: 30px; font-size: 12px; color: #666; border-top: 1px solid #ddd; padding-top: 10px; }
