@@ -1,0 +1,47 @@
+{
+  "name": "smart-virke-kapningsberaknare",
+  "version": "1.0.0",
+  "description": "A comprehensive Swedish timber and cutting optimization calculator",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000",
+    "build": "echo 'No build process needed - pure HTML/CSS/JS application'",
+    "test": "echo 'No tests configured yet'",
+    "lint": "echo 'No linting configured yet'",
+    "deploy": "echo 'Deploy to GitHub Pages via GitHub Actions'",
+    "preview": "python3 dev-server.py"
+  },
+  "keywords": [
+    "timber",
+    "lumber",
+    "cutting",
+    "optimization",
+    "calculator",
+    "swedish",
+    "virke",
+    "kapning",
+    "beraknare"
+  ],
+  "author": "Sebastian Bryneholt",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/smart-virke-kapningsberaknare.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/smart-virke-kapningsberaknare/issues"
+  },
+  "homepage": "https://github.com/yourusername/smart-virke-kapningsberaknare#readme",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

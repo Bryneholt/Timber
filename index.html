@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Virke- och Kapningsberäknare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <h1>Smart Virke- och Kapningsberäknare</h1>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="artiklar">Artiklar</div>
+            <div class="tab" data-tab="lager">Lagerlängder</div>
+            <div class="tab" data-tab="resultat">Resultat</div>
+            <div class="tab" data-tab="projekt">Spara/Ladda Projekt</div>
+            <div class="tab" data-tab="data">Material Data</div>
+        </div>
+        
+        <!-- Artiklar Tab -->
+        <div class="tab-content active" id="artiklar-content">
+            <h3>Lägg till virke som behövs</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Definiera allt virke du behöver för ditt projekt här. Du kan lägga till flera artiklar med olika dimensioner.
+            </div>
+            
+            <!-- Company and Category Selection -->
+            <div id="company-selector-container">
+                <!-- Company selector will be loaded here -->
+            </div>
+            
+            <form id="artikel-form">
+                <div class="flex">
+                    <div class="form-group">
+                        <label for="dimension-select">Standarddimension:</label>
+                        <select id="dimension-select">
+                            <!-- Populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="artikel-namn">Artikelnamn/Dimension:</label>
+                        <input type="text" id="artikel-namn" placeholder="t.ex. 45x95, Takregel, etc.">
+                    </div>
+                </div>
+                
+                <div class="flex">
+                    <div class="form-group">
+                        <label for="behov-antal">Antal stycken:</label>
+                        <input type="number" min="1" id="behov-antal" placeholder="Antal bitar">
+                    </div>
+                    <div class="form-group">
+                        <label for="behov-langd">Längd per styck (mm):</label>
+                        <input type="number" min="1" id="behov-langd" placeholder="t.ex. 2400">
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button type="button" id="clear-artikel-btn" class="secondary">
+                        <i class="fas fa-eraser"></i> Rensa
+                    </button>
+                    <button type="submit" id="add-artikel-btn">
+                        <i class="fas fa-plus"></i> Lägg till artikel
+                    </button>
+                </div>
+                
+                <!-- Available Lengths Container -->
+                <div id="standard-lengths-container">
+                    <!-- Available lengths will be populated here -->
+                </div>
+            </form>
+            
+            <h3>Tillagda artiklar</h3>
+            <div id="artikel-table-container">
+                <table id="artikel-table">
+                    <thead>
+                        <tr>
+                            <th>Namn</th>
+                            <th>Antal</th>
+                            <th>Längd (mm)</th>
+                            <th>Total längd (m)</th>
+                            <th>Åtgärder</th>
+                        </tr>
+                    </thead>
+                    <tbody id="artikel-list">
+                        <!-- Artiklar kommer att läggas till här dynamiskt -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="actions">
+                <button type="button" id="calculate-btn" class="secondary">
+                    <i class="fas fa-calculator"></i> Beräkna optimal kapning
+                </button>
+            </div>
+        </div>
+        
+        <!-- Lager Tab -->
+        <div class="tab-content" id="lager-content">
+            <h3>Hantera lagerlängder</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Definiera vilka längder som finns tillgängliga för inköp och deras priser per meter.
+            </div>
+            
+            <div class="flex">
+                <div class="form-group">
+                    <label for="dimension-filter">Välj dimension:</label>
+                    <select id="dimension-filter">
+                        <!-- Dimensioner kommer att läggas till här dynamiskt -->
+                    </select>
+                </div>
+            </div>
+            
+            <form id="lager-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lager-langd">Längd (mm):</label>
+                        <input type="number" min="1" id="lager-langd" placeholder="t.ex. 3600">
+                    </div>
+                    <div class="form-group">
+                        <label for="lager-pris">Pris per meter (kr):</label>
+                        <input type="number" min="0" step="0.01" id="lager-pris" placeholder="t.ex. 22.50">
+                    </div>
+                    <button type="submit" id="add-lager-btn">
+                        <i class="fas fa-plus"></i> Lägg till
+                    </button>
+                </div>
+            </form>
+            
+            <div id="standard-lengths-container">
+                <h4>Vanliga standardlängder</h4>
+                <!-- Populated by JavaScript -->
+            </div>
+            
+            <h4>Lagerlängder för <span id="current-dimension">denna dimension</span></h4>
+            <div id="lager-list">
+                <!-- Lagerlängder kommer att läggas till här dynamiskt -->
+            </div>
+        </div>
+        
+        <!-- Resultat Tab -->
+        <div class="tab-content" id="resultat-content">
+            <h3>Optimerad kapning</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Här visas den optimala kapningen baserat på dina artiklar och tillgängliga lagerlängder.
+            </div>
+            
+            <div class="flex">
+                <div class="form-group">
+                    <label for="optimization-strategy">Optimeringsmetod:</label>
+                    <select id="optimization-strategy">
+                        <!-- Populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+            
+            <div id="result-container">
+                <!-- Resultat kommer att visas här -->
+                <div class="no-results">
+                    <i class="fas fa-calculator fa-3x"></i>
+                    <p>Lägg till artiklar och lagerlängder, sedan klicka på "Beräkna optimal kapning"</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Projekt Tab -->
+        <div class="tab-content" id="projekt-content">
+            <h3>Hantera projekt</h3>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Här kan du spara ditt nuvarande projekt eller ladda ett tidigare sparat projekt.
+            </div>
+            
+            <div class="form-group">
+                <label for="projekt-namn">Projektnamn:</label>
+                <input type="text" id="projekt-namn" placeholder="t.ex. Altan 2025">
+            </div>
+            
+            <div class="actions">
+                <button id="save-projekt-btn">
+                    <i class="fas fa-save"></i> Spara projekt
+                </button>
+                <button id="export-projekt-btn" class="secondary">
+                    <i class="fas fa-file-export"></i> Exportera som JSON
+                </button>
+            </div>
+            
+            <h4>Sparade projekt</h4>
+            <div id="saved-projects">
+                <!-- Sparade projekt kommer att visas här -->
+                <p>Inga sparade projekt hittades.</p>
+            </div>
+            
+            <h4>Importera projekt</h4>
+            <div class="form-group">
+                <label for="import-file">Välj JSON-fil att importera:</label>
+                <input type="file" id="import-file" accept=".json">
+            </div>
+            <button id="import-projekt-btn">
+                <i class="fas fa-file-import"></i> Importera projekt
+            </button>
+        </div>
+        
+        <!-- Data Management Tab -->
+        <div class="tab-content" id="data-content">
+            <div id="data-manager-container">
+                <!-- Data manager content will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Redigera artikel</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label for="edit-namn">Artikelnamn/Dimension:</label>
+                    <input type="text" id="edit-namn">
+                </div>
+                <div class="flex">
+                    <div class="form-group">
+                        <label for="edit-antal">Antal stycken:</label>
+                        <input type="number" min="1" id="edit-antal">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-langd">Längd per styck (mm):</label>
+                        <input type="number" min="1" id="edit-langd">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="secondary modal-close-btn">Avbryt</button>
+                    <button type="submit">Spara ändringar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

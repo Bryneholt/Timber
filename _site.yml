@@ -1,0 +1,38 @@
+# Jekyll configuration for GitHub Pages
+# This file is optional but can help with SEO and site structure
+
+title: Smart Virke- och Kapningsberäknare
+description: En omfattande svensk virkes- och kapningsberäknare som hjälper dig minimera spill och kostnader vid virkesprojekt
+author: Sebastian Bryneholt
+email: your-email@example.com
+url: "https://yourusername.github.io/smart-virke-kapningsberaknare"
+
+# Build settings
+theme: jekyll-theme-minimal
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Collections
+collections:
+  data:
+    output: false
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+
+# Exclude from processing
+exclude:
+  - node_modules
+  - .git
+  - .github
+  - README.md
+  - package.json
+  - package-lock.json
+  - .gitignore
+  - dev-server.py
