@@ -48,8 +48,11 @@ export class UIComponents {
             }
         });
         
-        // Visualize waste
+        // Add cut line before waste if there is spill to cut off
         if (spillLangd > 0) {
+            html += `<div class="cut-line" title="Kapa av spill här"></div>`;
+            
+            // Visualize waste
             const spillBredde = (spillLangd / plankaLangd) * 100;
             html += `
                 <div class="segment spill" style="width: ${spillBredde}%;" title="Spill: ${spillLangd} mm">
